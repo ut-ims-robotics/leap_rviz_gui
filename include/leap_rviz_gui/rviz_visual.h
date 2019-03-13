@@ -185,6 +185,8 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["view_up"];
       pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["to_menu"];
+      pub_vec_[n].publish(marker_vec_[n]);
 
       break;
     default:
@@ -325,11 +327,12 @@ dir
 2 -> up
 3 -> down
 */
-void setNewCamTra(int dir, double dx){
+void setNewCamTra(int dir, int n){
   rviz_animated_view_controller::CameraMovement cam_mov;
 
   cam_mov = cam_tra_.trajectory[0];
   double dist = 2.5;
+
 
 
   geometry_msgs::TransformStamped ts;
@@ -348,34 +351,29 @@ void setNewCamTra(int dir, double dx){
       // ROS_INFO_STREAM(cam_mov.eye.point.x);
       // ROS_INFO_STREAM(cam_mov.eye.point.y);
 
-      if (cam_mov.eye.point.y < -0.001){
-        cam_mov.eye.point.x += dx;
-        cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      }else if (cam_mov.eye.point.y > 0.001){
-        cam_mov.eye.point.x -= dx;
-        cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      }else {
-        if (cam_mov.eye.point.x > 0){
-          cam_mov.eye.point.x -= dx;
-          cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }else {
-          cam_mov.eye.point.x += dx;
-          cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        } 
-      }
-
-
-
-      
+      // if (cam_mov.eye.point.y < -0.001){
+      //   cam_mov.eye.point.x += dx;
+      //   cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      // }else if (cam_mov.eye.point.y > 0.001){
+      //   cam_mov.eye.point.x -= dx;
+      //   cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      // }else {
+      //   if (cam_mov.eye.point.x > 0){
+      //     cam_mov.eye.point.x -= dx;
+      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }else {
+      //     cam_mov.eye.point.x += dx;
+      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   } 
+      // }
 
       // ROS_INFO_STREAM("after:");
       // ROS_INFO_STREAM(cam_mov.eye.point.x);
       // ROS_INFO_STREAM(cam_mov.eye.point.y);
       
 
-      body_frame_rot_yaw_ += (M_PI * dx / dist);
-
-
+     
+      body_frame_rot_yaw_ += M_PI / n;
       framePublish();
       // printFrameRot();
       
@@ -387,29 +385,33 @@ void setNewCamTra(int dir, double dx){
       // cam_mov.eye.point.y = 0; 
       
       
-      if (cam_mov.eye.point.y < -0.001){
-        cam_mov.eye.point.x -= dx;
-        cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      }else if (cam_mov.eye.point.y > 0.001){
-        cam_mov.eye.point.x += dx;
-        cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      }else {
-        if (cam_mov.eye.point.x > 0){
-          cam_mov.eye.point.x -= dx;
-          cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }else {
-          cam_mov.eye.point.x += dx;
-          cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        } 
-      }
-      
+      // if (cam_mov.eye.point.y < -0.001){
+      //   cam_mov.eye.point.x -= dx;
+      //   cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      // }else if (cam_mov.eye.point.y > 0.001){
+      //   cam_mov.eye.point.x += dx;
+      //   cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      // }else {
+      //   ROS_INFO_STREAM(i);
+      //   if (cam_mov.eye.point.x > 0){
+      //     cam_mov.eye.point.x -= dx;
+      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }else {
+      //     cam_mov.eye.point.x += dx;
+      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   } 
+      // }
+      // i++;
       // ROS_INFO_STREAM("after:");
       // ROS_INFO_STREAM(cam_mov.eye.point.x);
       // ROS_INFO_STREAM(cam_mov.eye.point.y);
       // ROS_INFO_STREAM(cam_mov.eye.point.z);
       
+      // ROS_INFO_STREAM(i);
+      
 
-      body_frame_rot_yaw_ -= (M_PI * dx / dist);
+      // body_frame_rot_yaw_ -= (M_PI * dx / sqrt(pow(dist, 2) + pow(dist, 2)));
+      body_frame_rot_yaw_ -= M_PI / n;
       framePublish();
       //  printFrameRot();
       
@@ -424,15 +426,15 @@ void setNewCamTra(int dir, double dx){
       // ROS_INFO_STREAM(cam_mov.eye.point.y);
       // ROS_INFO_STREAM(cam_mov.eye.point.z);
 
-      if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
-        cam_mov.eye.point.z -= dx;
-        if (cam_mov.eye.point.x > 0){
-          cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }else {
-          cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }
+      // if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
+      //   cam_mov.eye.point.z -= dx;
+      //   if (cam_mov.eye.point.x > 0){
+      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }else {
+      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }
         
-      }
+      // }
       
       // ROS_INFO_STREAM("after:");
       // ROS_INFO_STREAM(cam_mov.eye.point.x);
@@ -441,32 +443,34 @@ void setNewCamTra(int dir, double dx){
 
 
 
-
+      body_frame_rot_roll_ += M_PI / n;
+      framePublish();
 
       break;
     case 3:
 
-      ROS_INFO_STREAM("before:");
-      ROS_INFO_STREAM(cam_mov.eye.point.x);
-      ROS_INFO_STREAM(cam_mov.eye.point.y);
-      ROS_INFO_STREAM(cam_mov.eye.point.z);
+      // ROS_INFO_STREAM("before:");
+      // ROS_INFO_STREAM(cam_mov.eye.point.x);
+      // ROS_INFO_STREAM(cam_mov.eye.point.y);
+      // ROS_INFO_STREAM(cam_mov.eye.point.z);
 
-      if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
-        cam_mov.eye.point.z += dx;
-        if (cam_mov.eye.point.x > 0){
-          cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }else {
-          cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-        }
+      // if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
+      //   cam_mov.eye.point.z += dx;
+      //   if (cam_mov.eye.point.x > 0){
+      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }else {
+      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
+      //   }
         
-      }
+      // }
       
-      ROS_INFO_STREAM("after:");
-      ROS_INFO_STREAM(cam_mov.eye.point.x);
-      ROS_INFO_STREAM(cam_mov.eye.point.y);
-      ROS_INFO_STREAM(cam_mov.eye.point.z);
+      // ROS_INFO_STREAM("after:");
+      // ROS_INFO_STREAM(cam_mov.eye.point.x);
+      // ROS_INFO_STREAM(cam_mov.eye.point.y);
+      // ROS_INFO_STREAM(cam_mov.eye.point.z);
 
-
+      body_frame_rot_roll_ -= M_PI / n;
+      framePublish();
 
 
 
@@ -639,12 +643,16 @@ private:
     marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
     marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
     
+    marker_vec_.push_back(markerInit(SPHERE, "", 0, DIST_MENU_Y_ - 0.2, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "to_menu", 0.4f, 1.0f, 1.0f, 0.4f));
+    
+
+  
     marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandLeft.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandRight.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
 
     marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
     marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
-
+    
 
     fillMap();
 
@@ -771,6 +779,7 @@ private:
 
 
   // ___ CLASS VARIABLES AND CONSTANTS ___
+
 
 
   ros::NodeHandle node_handle_;

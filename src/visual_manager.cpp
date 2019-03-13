@@ -42,6 +42,8 @@ bool hand_marker_collision(visualization_msgs::Marker marker, int hand){
 	
 	//getting info about correct hand
 	geometry_msgs::PointStamped hand_point_stamped;
+	
+
 	if (hand == 0){
 		if (manager->getUse_leap_hands()){
 			if (manager->getLeft().is_present){
@@ -172,7 +174,7 @@ int main(int argc, char** argv)
 	
   	tf::TransformListener tf_listener;
 
-	double dx = 0.025;	
+	int number_of_view_points = 10000;	
 
 	while(ros::ok()){		
 		manager->publishMarkers();
@@ -289,7 +291,7 @@ int main(int argc, char** argv)
 					if (hand_marker_collision(manager->getMarker("view_left"), 0) ||
 						hand_marker_collision(manager->getMarker("view_left"), 1)){
 						
-						manager->setNewCamTra(0, dx);
+						manager->setNewCamTra(0, number_of_view_points);
 						manager->setAdjust_camera(true);
 
 						ROS_INFO_STREAM("Touching left");
@@ -297,7 +299,7 @@ int main(int argc, char** argv)
 					}else if (hand_marker_collision(manager->getMarker("view_right"), 0) ||
 						hand_marker_collision(manager->getMarker("view_right"), 1)){
 						
-						manager->setNewCamTra(1, dx);
+						manager->setNewCamTra(1, number_of_view_points);
 						manager->setAdjust_camera(true);
 
 						//manager->frameChange();
@@ -307,7 +309,7 @@ int main(int argc, char** argv)
 					}else if (hand_marker_collision(manager->getMarker("view_up"), 0) ||
 						hand_marker_collision(manager->getMarker("view_up"), 1)){
 						
-						manager->setNewCamTra(2, dx);
+						manager->setNewCamTra(2, number_of_view_points);
 						manager->setAdjust_camera(true);
 
 						//manager->frameChange();
@@ -317,12 +319,17 @@ int main(int argc, char** argv)
 					}else if (hand_marker_collision(manager->getMarker("view_down"), 0) ||
 						hand_marker_collision(manager->getMarker("view_down"), 1)){
 						
-						manager->setNewCamTra(3, dx);
+						manager->setNewCamTra(3, number_of_view_points);
 						manager->setAdjust_camera(true);
 
 						//manager->frameChange();
 
 						ROS_INFO_STREAM("Touching down");
+
+					}else if (hand_marker_collision(manager->getMarker("to_menu"), 0) ||
+						hand_marker_collision(manager->getMarker("to_menu"), 1)){
+						
+						manager->setMode(0);
 
 					} 
 

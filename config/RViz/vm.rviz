@@ -9,8 +9,7 @@ Panels:
         - /Axes_body1
         - /Axes_world1
         - /Menu_marker1
-        - /Left_active_area1
-        - /Right_active_area1
+        - /To_menu1
       Splitter Ratio: 0.5
     Tree Height: 507
   - Class: rviz/Selection
@@ -308,12 +307,12 @@ Visualization Manager:
       Value: true
       Velocity_Scaling_Factor: 1
     - Class: rviz/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Axes_leap_hands
       Radius: 0.0500000007
       Reference Frame: leap_hands
-      Value: true
+      Value: false
     - Class: rviz/Axes
       Enabled: true
       Length: 1
@@ -381,7 +380,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/custom_right_marker
       Name: Leap_r_hand_w_gain
       Namespaces:
-        {}
+        custom_right: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -389,7 +388,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_left_marker
       Name: View_left
       Namespaces:
-        {}
+        view_left: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -397,7 +396,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_right_marker
       Name: View_right
       Namespaces:
-        {}
+        view_right: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -405,7 +404,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_up_marker
       Name: View_up
       Namespaces:
-        {}
+        view_up: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -413,7 +412,16 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_down_marker
       Name: View_down
       Namespaces:
-        {}
+        view_down: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visual_manager/to_menu_marker
+      Name: To_menu
+      Namespaces:
+        to_menu: true
+        view_down: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -429,7 +437,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/right_active_marker
       Name: Right_active_area
       Namespaces:
-        {}
+        right_active: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -458,20 +466,20 @@ Visualization Manager:
     Current:
       Class: rviz_animated_view_controller/Animated
       Control Mode: Orbit
-      Distance: 2.50062299
+      Distance: 2.50000024
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Eye:
-        X: -1.14278257
-        Y: -0.553570628
-        Z: -2.15409732
+        X: 0
+        Y: -2.50000024
+        Z: 0
       Focus:
-        X: 4.87565994e-05
-        Y: 0.000137209892
-        Z: 7.55786896e-05
+        X: 0
+        Y: 0
+        Z: 0
       Invert Z Axis: false
       Maintain Vertical Axis: true
       Mouse Enabled: true
