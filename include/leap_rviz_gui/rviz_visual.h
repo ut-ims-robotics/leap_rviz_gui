@@ -114,6 +114,10 @@ visualization_msgs::Marker getMarker(const std::string& m){
   return marker_vec_[marker_map_[m]];
 }
 
+visualization_msgs::Marker getCustomRight(){
+  int n = marker_map_["custom_right"];
+  return marker_vec_[n];
+}
 
 /*dir
 0 = left
@@ -341,6 +345,7 @@ void setNewCamTra(int dir, int n){
   switch (dir){
     case 0:
       body_frame_rot_yaw_ += M_PI / n;
+      body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
       // printFrameRot();
       
@@ -348,6 +353,7 @@ void setNewCamTra(int dir, int n){
     
     case 1: 
       body_frame_rot_yaw_ -= M_PI / n;
+      body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
       //  printFrameRot();
       
@@ -355,12 +361,14 @@ void setNewCamTra(int dir, int n){
     
     case 2:
       body_frame_rot_roll_ += M_PI / n;
+      body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
       //  printFrameRot();
 
       break;
     case 3:
       body_frame_rot_roll_ -= M_PI / n;
+      body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
       //  printFrameRot();
 
@@ -372,6 +380,23 @@ void setNewCamTra(int dir, int n){
 }
 
 
+geometry_msgs::Point transformBetweenFrames(geometry_msgs::Point p, const std::string& frameFrom, const std::string& frameTo){
+	// tf from handframe to world
+
+	tf2_ros::Buffer tfBuffer;
+	geometry_msgs::TransformStamped trans;
+	geometry_msgs::PointStamped temp_point_stamped;
+	tf2_ros::TransformListener tf2_listener(tfBuffer);
+	try{
+		trans = tfBuffer.lookupTransform(frameTo, frameFrom, ros::Time(0), ros::Duration(1.0) );
+		temp_point_stamped.point = p;
+		tf2::doTransform(temp_point_stamped, temp_point_stamped, trans);
+	}catch (tf2::LookupException e){
+		ROS_ERROR_STREAM("Lets wait a bit" << e.what());
+	}
+
+	return temp_point_stamped.point;
+}
 
 
 
@@ -444,7 +469,7 @@ void leapFilCallback(const leap_motion::Human& msg){
       int n = marker_map_["custom_right"];
       visualization_msgs::Marker m = marker_vec_[n];
         
-      //getting a left hand pos and multiplying it with the gain
+      //getting a right hand pos and multiplying it with the gain
       m.pose.position.x = right_.palm_center.x * gain_x_;
       m.pose.position.y = right_.palm_center.y * gain_y_;
       m.pose.position.z = right_.palm_center.z * gain_z_;
@@ -453,12 +478,12 @@ void leapFilCallback(const leap_motion::Human& msg){
 
 
       
-      //getting left hand orientation
+      //getting right hand orientation
       float roll = right_.roll;
       float pitch = right_.pitch;
       float yaw = right_.yaw;
 
-      //checking orientation, Leap Motion has a problem there with turing hands around
+      //checking orientation, Leap Motion has a problem with turing hands around yaw
       tf2::Quaternion q;
       if (abs(yaw) > M_PI/2){
           q.setRPY(-(roll), pitch, yaw);            
@@ -488,16 +513,17 @@ void leapFilCallback(const leap_motion::Human& msg){
 
       //!!!! make goal_state/robot arm to follow right hand
       pub_vec_[n].publish(marker_vec_[n]);
+      
       goal_state_pose_.pose = m.pose;
 
       n = marker_map_["right_active"];
-
       marker_vec_[n].pose = m.pose;
-      
-      //marker_vec[n].pose.position.y = m.pose.position.y + sin(radToDeg(roll)) * distToHandC;
-      //marker_vec[n].pose.position.y = m.pose.position.x + asin(radToDeg(roll)) * distToHandC;
-      
       pub_vec_[n].publish(marker_vec_[n]);
+      
+
+      // n = marker_map_["hand_marker"];
+      // marker_vec_[n].pose = m.pose;
+      // pub_vec_[n].publish(marker_vec_[n]);
       
   }
 
@@ -538,6 +564,8 @@ private:
   
     marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandLeft.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandRight.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
+
+
 
     marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
     marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
@@ -655,6 +683,8 @@ private:
 
     return marker;
   }
+
+
 
   void fillMap(){
     for(int i = 0; i < marker_vec_.size(); i++){

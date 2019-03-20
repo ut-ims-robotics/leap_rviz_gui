@@ -93,26 +93,6 @@ bool hand_marker_collision(visualization_msgs::Marker marker, int hand){
 	return false;
 }
 
-geometry_msgs::Point tf_world_2_hand(geometry_msgs::Point p){
-	// tf from world to handtf_l
-
-	tf2_ros::Buffer tfBuffer;
-	geometry_msgs::TransformStamped hand_to_world;
-	geometry_msgs::PointStamped temp_point_stamped;
-	tf2_ros::TransformListener tf2_listener(tfBuffer);
-	try{
-		hand_to_world = tfBuffer.lookupTransform("world", "leap_hands", ros::Time(0), ros::Duration(1.0) );
-		temp_point_stamped.point = p;
-		tf2::doTransform(temp_point_stamped, temp_point_stamped, hand_to_world);
-	}catch (tf2::LookupException e){
-		ROS_ERROR_STREAM("Lets wait a bit" << e.what());
-	}
-
-
-	
-
-	return temp_point_stamped.point;
-}
 
 
 //callbacks
@@ -193,7 +173,8 @@ int main(int argc, char** argv)
 				//goal_state_pose update
 				if (manager->getRight().is_present){
 					geometry_msgs::PoseStamped temp_pose_stmp = manager->getGoal_state_pose();
-					temp_pose_stmp.pose.position = tf_world_2_hand(temp_pose_stmp.pose.position);
+					temp_pose_stmp.pose.position = manager->transformBetweenFrames(temp_pose_stmp.pose.position, "leap_hands", "world");
+					//tf_world_2_hand(temp_pose_stmp.pose.position);
 
 					pub_goal_ee_link.publish(temp_pose_stmp);
 			
@@ -209,7 +190,9 @@ int main(int argc, char** argv)
 						if (manager->getRight().is_present){
 							
 							geometry_msgs::Pose right_hand_palm_pose;
-							right_hand_palm_pose.position = tf_world_2_hand(manager->getRight().palm_center);
+							right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
+							//tf_world_2_hand(manager->getRight().palm_center);
 							right_hand_palm_pose.orientation.w = 1;
 						
 						
@@ -237,7 +220,9 @@ int main(int argc, char** argv)
 							
 
 							geometry_msgs::Pose right_hand_palm_pose;
-							right_hand_palm_pose.position = tf_world_2_hand(manager->getRight().palm_center);
+							right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
+							//tf_world_2_hand(manager->getRight().palm_center);
 							right_hand_palm_pose.orientation.w = 1;
 							
 
