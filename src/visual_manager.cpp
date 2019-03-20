@@ -211,7 +211,8 @@ int main(int argc, char** argv)
 							geometry_msgs::Pose right_hand_palm_pose;
 							right_hand_palm_pose.position = tf_world_2_hand(manager->getRight().palm_center);
 							right_hand_palm_pose.orientation.w = 1;
-							
+						
+						
 							//robot planning
 							move_group.setPoseTarget(right_hand_palm_pose);
 						
@@ -224,6 +225,11 @@ int main(int argc, char** argv)
 							visual_tools.trigger();
 
 							move_group.plan(my_plan);
+							
+							ROS_INFO_STREAM("Touching PLAN");
+							ROS_INFO_STREAM(right_hand_palm_pose);
+							ROS_INFO_STREAM("Done PLAN");
+							ROS_INFO_STREAM(move_group.getCurrentPose());
 						}
 					}else if (hand_marker_collision(manager->getMarker("execute"), 0)){
 						
@@ -233,6 +239,8 @@ int main(int argc, char** argv)
 							geometry_msgs::Pose right_hand_palm_pose;
 							right_hand_palm_pose.position = tf_world_2_hand(manager->getRight().palm_center);
 							right_hand_palm_pose.orientation.w = 1;
+							
+
 							
 							//robot planning
 							move_group.setPoseTarget(right_hand_palm_pose);
@@ -246,6 +254,11 @@ int main(int argc, char** argv)
 							visual_tools.trigger();
 
 							move_group.move();
+
+							ROS_INFO_STREAM("Touching EXECUTE");
+							ROS_INFO_STREAM(right_hand_palm_pose);
+							ROS_INFO_STREAM("Done EXECUTE");
+							ROS_INFO_STREAM(move_group.getCurrentPose());
 						}
 					}
 					
@@ -288,50 +301,53 @@ int main(int argc, char** argv)
 					// cam_mov = manager->getCam_tra().trajectory.pop_back();
 					
   //if present missing
-					if (hand_marker_collision(manager->getMarker("view_left"), 0) ||
-						hand_marker_collision(manager->getMarker("view_left"), 1)){
-						
-						manager->setNewCamTra(0, number_of_view_points);
-						manager->setAdjust_camera(true);
+					if (manager->getLeft().is_present ||
+						manager->getRight().is_present){
+						if (hand_marker_collision(manager->getMarker("view_left"), 0) ||
+							hand_marker_collision(manager->getMarker("view_left"), 1)){
+							
+							manager->setNewCamTra(0, number_of_view_points);
+							manager->setAdjust_camera(true);
 
-						ROS_INFO_STREAM("Touching left");
+							// ROS_INFO_STREAM("Touching left");
 
-					}else if (hand_marker_collision(manager->getMarker("view_right"), 0) ||
-						hand_marker_collision(manager->getMarker("view_right"), 1)){
-						
-						manager->setNewCamTra(1, number_of_view_points);
-						manager->setAdjust_camera(true);
+						}else if (hand_marker_collision(manager->getMarker("view_right"), 0) ||
+							hand_marker_collision(manager->getMarker("view_right"), 1)){
+							
+							manager->setNewCamTra(1, number_of_view_points);
+							manager->setAdjust_camera(true);
 
-						//manager->frameChange();
+							//manager->frameChange();
 
-						ROS_INFO_STREAM("Touching right");
+							// ROS_INFO_STREAM("Touching right");
 
-					}else if (hand_marker_collision(manager->getMarker("view_up"), 0) ||
-						hand_marker_collision(manager->getMarker("view_up"), 1)){
-						
-						manager->setNewCamTra(2, number_of_view_points);
-						manager->setAdjust_camera(true);
+						}else if (hand_marker_collision(manager->getMarker("view_up"), 0) ||
+							hand_marker_collision(manager->getMarker("view_up"), 1)){
+							
+							manager->setNewCamTra(2, number_of_view_points);
+							manager->setAdjust_camera(true);
 
-						//manager->frameChange();
+							//manager->frameChange();
 
-						ROS_INFO_STREAM("Touching up");
+							// ROS_INFO_STREAM("Touching up");
 
-					}else if (hand_marker_collision(manager->getMarker("view_down"), 0) ||
-						hand_marker_collision(manager->getMarker("view_down"), 1)){
-						
-						manager->setNewCamTra(3, number_of_view_points);
-						manager->setAdjust_camera(true);
+						}else if (hand_marker_collision(manager->getMarker("view_down"), 0) ||
+							hand_marker_collision(manager->getMarker("view_down"), 1)){
+							
+							manager->setNewCamTra(3, number_of_view_points);
+							manager->setAdjust_camera(true);
 
-						//manager->frameChange();
+							//manager->frameChange();
 
-						ROS_INFO_STREAM("Touching down");
+							// ROS_INFO_STREAM("Touching down");
 
-					}else if (hand_marker_collision(manager->getMarker("to_menu"), 0) ||
-						hand_marker_collision(manager->getMarker("to_menu"), 1)){
-						
-						manager->setMode(0);
+						}else if (hand_marker_collision(manager->getMarker("to_menu"), 0) ||
+							hand_marker_collision(manager->getMarker("to_menu"), 1)){
+							
+							manager->setMode(0);
 
-					} 
+						} 
+					}
 
 
 					

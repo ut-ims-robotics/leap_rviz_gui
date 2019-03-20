@@ -33,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: ""
   - Class: rviz_visual_tools/RvizVisualToolsGui
     Name: RvizVisualToolsGui
 Visualization Manager:
@@ -463,7 +463,7 @@ Visualization Manager:
       OSVR tf frame: /rviz_plugin_osvr/head
       Offset:
         X: 0
-        Y: 0
+        Y: -1
         Z: 0
       Publish tf: true
       Reset orientation: false
@@ -473,7 +473,7 @@ Visualization Manager:
         Z: 1
       Screen name: HDMI-0
       Target frame: body
-      Use tracker: true
+      Use tracker: false
       Value: true
   Enabled: true
   Global Options:
@@ -501,7 +501,7 @@ Visualization Manager:
     Current:
       Class: rviz_animated_view_controller/Animated
       Control Mode: Orbit
-      Distance: 6.93268824
+      Distance: 2.5
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -509,8 +509,8 @@ Visualization Manager:
         Value: false
       Eye:
         X: 0
-        Y: -6.93268776
-        Z: 2.47932257e-06
+        Y: -2.5
+        Z: 0
       Focus:
         X: 0
         Y: 0

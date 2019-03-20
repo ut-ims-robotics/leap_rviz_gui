@@ -340,39 +340,6 @@ void setNewCamTra(int dir, int n){
 
   switch (dir){
     case 0:
-
-      
-      
-      // cam_mov.eye.point.x = -2.5;
-      // cam_mov.eye.point.y = 0; 
-
-      // framePublish();
-      // ROS_INFO_STREAM("before:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-
-      // if (cam_mov.eye.point.y < -0.001){
-      //   cam_mov.eye.point.x += dx;
-      //   cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      // }else if (cam_mov.eye.point.y > 0.001){
-      //   cam_mov.eye.point.x -= dx;
-      //   cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      // }else {
-      //   if (cam_mov.eye.point.x > 0){
-      //     cam_mov.eye.point.x -= dx;
-      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }else {
-      //     cam_mov.eye.point.x += dx;
-      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   } 
-      // }
-
-      // ROS_INFO_STREAM("after:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      
-
-     
       body_frame_rot_yaw_ += M_PI / n;
       framePublish();
       // printFrameRot();
@@ -380,104 +347,26 @@ void setNewCamTra(int dir, int n){
       break;
     
     case 1: 
-      
-      // cam_mov.eye.point.x = 2.5;
-      // cam_mov.eye.point.y = 0; 
-      
-      
-      // if (cam_mov.eye.point.y < -0.001){
-      //   cam_mov.eye.point.x -= dx;
-      //   cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      // }else if (cam_mov.eye.point.y > 0.001){
-      //   cam_mov.eye.point.x += dx;
-      //   cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      // }else {
-      //   ROS_INFO_STREAM(i);
-      //   if (cam_mov.eye.point.x > 0){
-      //     cam_mov.eye.point.x -= dx;
-      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }else {
-      //     cam_mov.eye.point.x += dx;
-      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   } 
-      // }
-      // i++;
-      // ROS_INFO_STREAM("after:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      // ROS_INFO_STREAM(cam_mov.eye.point.z);
-      
-      // ROS_INFO_STREAM(i);
-      
-
-      // body_frame_rot_yaw_ -= (M_PI * dx / sqrt(pow(dist, 2) + pow(dist, 2)));
       body_frame_rot_yaw_ -= M_PI / n;
       framePublish();
       //  printFrameRot();
       
-    
       break;
     
     case 2:
-
-
-      // ROS_INFO_STREAM("before:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      // ROS_INFO_STREAM(cam_mov.eye.point.z);
-
-      // if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
-      //   cam_mov.eye.point.z -= dx;
-      //   if (cam_mov.eye.point.x > 0){
-      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }else {
-      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }
-        
-      // }
-      
-      // ROS_INFO_STREAM("after:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      // ROS_INFO_STREAM(cam_mov.eye.point.z);
-
-
-
       body_frame_rot_roll_ += M_PI / n;
       framePublish();
+      //  printFrameRot();
 
       break;
     case 3:
-
-      // ROS_INFO_STREAM("before:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      // ROS_INFO_STREAM(cam_mov.eye.point.z);
-
-      // if (cam_mov.eye.point.z < (dist - 3*dx) && cam_mov.eye.point.z > (3*dx - dist)){
-      //   cam_mov.eye.point.z += dx;
-      //   if (cam_mov.eye.point.x > 0){
-      //     cam_mov.eye.point.y = calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }else {
-      //     cam_mov.eye.point.y = -calc3rdPoint(dist, cam_mov.eye.point.x, cam_mov.eye.point.z);
-      //   }
-        
-      // }
-      
-      // ROS_INFO_STREAM("after:");
-      // ROS_INFO_STREAM(cam_mov.eye.point.x);
-      // ROS_INFO_STREAM(cam_mov.eye.point.y);
-      // ROS_INFO_STREAM(cam_mov.eye.point.z);
-
       body_frame_rot_roll_ -= M_PI / n;
       framePublish();
-
-
+      //  printFrameRot();
 
       break;
     
   }
-
 
   cam_tra_.trajectory[0] = cam_mov;
 }
@@ -643,7 +532,7 @@ private:
     marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
     marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
     
-    marker_vec_.push_back(markerInit(SPHERE, "", 0, DIST_MENU_Y_ - 0.2, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "to_menu", 0.4f, 1.0f, 1.0f, 0.4f));
+    marker_vec_.push_back(markerInit(SPHERE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "to_menu", 0.4f, 1.0f, 1.0f, 0.4f));
     
 
   

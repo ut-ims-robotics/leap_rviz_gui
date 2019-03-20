@@ -86,16 +86,8 @@
 		<!-- !!!!!!!!!!! RViz !!!!!!!!!!!!!!! -->
 		<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
 		<!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
-
-		<!-- OSVR SERVER -->
-		<node name="osvr_server" pkg="rviz_plugin_osvr" type="start_osvr_server.sh" />
     <!-- Open a preconfigured RViz window -->
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/vm_org.rviz" /> -->
-		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/leap_osvr_ur5.rviz" />
-		
-		<!-- OSVR dummyTargeFrame publisher -->
-		<node pkg="tf" type="static_transform_publisher" name="map_publisher" args="-5 0 1 0.1 0.1 0.1 1 world dummyTargeFrame 1"/>
-		
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/vm.rviz" />
 
 	<!-- Launch our own script -->
 	<!-- <node name="tester" pkg="leap_rviz_gui" type="test.cpp" respawn="false" output="screen"></node> -->
