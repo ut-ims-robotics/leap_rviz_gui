@@ -326,8 +326,8 @@ int main(int argc, char** argv)
 
 							// ROS_INFO_STREAM("Touching down");
 
-						}else if (hand_marker_collision(manager->getMarker("to_menu"), 0) ||
-							hand_marker_collision(manager->getMarker("to_menu"), 1)){
+						}else if (hand_marker_collision(manager->getMarker("back"), 0) ||
+							hand_marker_collision(manager->getMarker("back"), 1)){
 							
 							manager->setMode(0);
 

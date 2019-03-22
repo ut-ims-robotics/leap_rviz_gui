@@ -161,19 +161,29 @@ void publishMarkers(){
       if (activate_menu_) {
         n = marker_map_["plan"];
         pub_vec_[n].publish(marker_vec_[n]);
+        n = marker_map_["plan_text"];
+        pub_vec_[n].publish(marker_vec_[n]);
+        
         n = marker_map_["execute"];
+        pub_vec_[n].publish(marker_vec_[n]);
+        n = marker_map_["execute_text"];
         pub_vec_[n].publish(marker_vec_[n]);
 
       }else{
         n = marker_map_["menu"];
         pub_vec_[n].publish(marker_vec_[n]);
-
+        n = marker_map_["menu_text"];
+        pub_vec_[n].publish(marker_vec_[n]);
       }
       
       n = marker_map_["scale"];
       pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["scale_text"];
+      pub_vec_[n].publish(marker_vec_[n]);
       
       n = marker_map_["camera"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["camera_text"];
       pub_vec_[n].publish(marker_vec_[n]);
 
       break;
@@ -189,7 +199,9 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["view_up"];
       pub_vec_[n].publish(marker_vec_[n]);
-      n = marker_map_["to_menu"];
+      n = marker_map_["back"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["back_text"];
       pub_vec_[n].publish(marker_vec_[n]);
 
       break;
@@ -314,15 +326,15 @@ void framePublish(){
 
 
 
-double calc3rdPoint(double dist, double a, double b ){
+// double calc3rdPoint(double dist, double a, double b ){
 
-  /* 
-  dist2 = (a)2 + (b)2 + (C)2
-  (C)2 = dist2 - (a)2 - (b)2
-  C = sqrt(dist2 - (a)2 - (b)2)
-  */
-  return sqrt(pow(dist, 2) - pow(a, 2) - pow(b, 2));
-}
+//   /* 
+//   dist2 = (a)2 + (b)2 + (C)2
+//   (C)2 = dist2 - (a)2 - (b)2
+//   C = sqrt(dist2 - (a)2 - (b)2)
+//   */
+//   return sqrt(pow(dist, 2) - pow(a, 2) - pow(b, 2));
+// }
 
 /*
 dir
@@ -546,29 +558,38 @@ private:
   void generalMarkerInit(){
 
     //markers init
-    marker_vec_.push_back(markerInit(SPHERE, "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "menu", 0.4f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE, "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ + 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "plan", 1.0f, 1.0f, 0.6f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE, "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "execute", 0.0f, 1.0f, 0.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE, "", DIST_MENU_X_ + 0.15, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "scale", 1.0f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE, "", DIST_MENU_X_ - 0.4, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "camera", 1.0f, 0.5f, 1.0f, 1.0f));
+    //markerInit(shape, mesh, text, pos_x, pos_y, pos_z, sca_x, sca_y, sca_z, ns, r, g, b, a)
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "menu", 0.4f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ + 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "plan", 1.0f, 1.0f, 0.6f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "execute", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ + 0.15, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "scale", 1.0f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ - 0.4, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "camera", 1.0f, 0.5f, 1.0f, 1.0f));
+
+    marker_vec_.push_back(markerInit(TEXT_, "", "MENU", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "menu_text", 0.4f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "PLAN", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "plan_text", 1.0f, 1.0f, 0.6f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "EXECUTE", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ - 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "execute_text", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "SCALE", DIST_MENU_X_ + 0.2, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "scale_text", 1.0f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));
+    
 
     
-    marker_vec_.push_back(markerInit(CUBE, "", 0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_left", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE, "", -0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_right", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_left", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", -0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_right", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
     
-    marker_vec_.push_back(markerInit(SPHERE, "", 0, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "to_menu", 0.4f, 1.0f, 1.0f, 0.4f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "back", 0.4f, 1.0f, 1.0f, 0.4f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "BACK", 0, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "back_text", 0.4f, 1.0f, 1.0f, 1.0f));
     
 
   
-    marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandLeft.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
-    marker_vec_.push_back(markerInit(visualization_msgs::Marker::MESH_RESOURCE, "package://leap_rviz_gui/stl/Black-HandRight.stl", 0, 0, 0, 0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandLeft.stl", "", 0, 0, 0, 0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandRight.stl", "", 0, 0, 0, 0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
 
 
 
-    marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
-    marker_vec_.push_back(markerInit(CUBE, "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
     
 
     fillMap();
@@ -636,7 +657,7 @@ private:
   }
 
   // ___ HELPER FUNCTIONS ___
-  visualization_msgs::Marker markerInit(uint32_t shape, const std::string& mesh, float_t pos_x, float_t pos_y, float_t pos_z, float_t sca_x, float_t sca_y, float_t sca_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
+  visualization_msgs::Marker markerInit(uint32_t shape, const std::string& mesh, const std::string& text, float_t pos_x, float_t pos_y, float_t pos_z, float_t sca_x, float_t sca_y, float_t sca_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
     visualization_msgs::Marker marker;
 
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
@@ -654,6 +675,7 @@ private:
     marker.mesh_resource = mesh;
     marker.mesh_use_embedded_materials = true;
 
+    marker.text = text;
 
     // Set the marker action.  Options are ADD, DELETE, and new in ROS Indigo: 3 (DELETEALL)
     marker.action = visualization_msgs::Marker::ADD;
@@ -757,8 +779,10 @@ private:
   // tf::Vector3 LEAP_ORG_POS_ = tf::Vector3(0, 0, 0.7);
   // tf::Quaternion LEAP_ORG_ROT_ = tf::Quaternion(3.14, 0, 0);
   const double MENU_CLOSING_DIST_ = 0.05;
-  const uint32_t SPHERE = visualization_msgs::Marker::SPHERE;
-  const uint32_t CUBE = visualization_msgs::Marker::CUBE;
+  const uint32_t SPHERE_ = visualization_msgs::Marker::SPHERE;
+  const uint32_t CUBE_ = visualization_msgs::Marker::CUBE;
+  const uint32_t TEXT_ = visualization_msgs::Marker::TEXT_VIEW_FACING;
+  const uint32_t MESH_ = visualization_msgs::Marker::MESH_RESOURCE;
   const float_t DIST_MENU_X_ = 0.2;
 	const float_t DIST_MENU_Y_ = 0.4;
 	const float_t DIST_MENU_Z_ = 0;

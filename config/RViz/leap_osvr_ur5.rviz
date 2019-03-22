@@ -8,9 +8,6 @@ Panels:
         - /TF1/Tree1
         - /Axes_body1
         - /Axes_world1
-        - /Menu_marker1
-        - /To_menu1
-        - /OSVR Plugin for RViz1
         - /OSVR Plugin for RViz1/Offset1
       Splitter Ratio: 0.5
     Tree Height: 480
@@ -33,7 +30,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
   - Class: rviz_visual_tools/RvizVisualToolsGui
     Name: RvizVisualToolsGui
 Visualization Manager:
@@ -173,10 +170,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          robot_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -191,6 +184,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           wrist_1_link:
             Alpha: 1
             Show Axes: false
@@ -270,10 +267,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          robot_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -288,6 +281,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           wrist_1_link:
             Alpha: 1
             Show Axes: false
@@ -339,10 +336,27 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
+      Marker Topic: /visual_manager/menu_text_marker
+      Name: Menu_text_marker
+      Namespaces:
+        menu: true
+        menu_text: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
       Marker Topic: /visual_manager/execute_marker
       Name: Execute_marker
       Namespaces:
-        {}
+        execute: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visual_manager/execute_text_marker
+      Name: Execute_text_marker
+      Namespaces:
+        execute_text: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -350,7 +364,15 @@ Visualization Manager:
       Marker Topic: /visual_manager/plan_marker
       Name: Plan_marker
       Namespaces:
-        {}
+        plan: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visual_manager/plan_text_marker
+      Name: Plan_text_marker
+      Namespaces:
+        plan_text: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -363,6 +385,15 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
+      Marker Topic: /visual_manager/scale_text_marker
+      Name: Scaler_text_marker
+      Namespaces:
+        scale: true
+        scale_text: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
       Marker Topic: /visual_manager/camera_marker
       Name: Camera_marker
       Namespaces:
@@ -371,10 +402,19 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
+      Marker Topic: /visual_manager/camera_text_marker
+      Name: Camera_text_marker
+      Namespaces:
+        camera: true
+        camera_text: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
       Marker Topic: /visual_manager/custom_left_marker
       Name: Leap_l_hand_w_gain
       Namespaces:
-        {}
+        custom_left: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -382,7 +422,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/custom_right_marker
       Name: Leap_r_hand_w_gain
       Namespaces:
-        {}
+        custom_right: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -390,7 +430,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_left_marker
       Name: View_left
       Namespaces:
-        {}
+        view_left: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -398,7 +438,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_right_marker
       Name: View_right
       Namespaces:
-        {}
+        view_right: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -406,7 +446,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_up_marker
       Name: View_up
       Namespaces:
-        {}
+        view_up: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -414,15 +454,23 @@ Visualization Manager:
       Marker Topic: /visual_manager/view_down_marker
       Name: View_down
       Namespaces:
-        {}
+        view_down: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /visual_manager/to_menu_marker
-      Name: To_menu
+      Marker Topic: /visual_manager/back_marker
+      Name: Back_marker
       Namespaces:
-        {}
+        back: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visual_manager/back_text_marker
+      Name: Back_text_marker
+      Namespaces:
+        back_text: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -430,7 +478,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/left_active_marker
       Name: Left_active_area
       Namespaces:
-        {}
+        left_active: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -438,7 +486,7 @@ Visualization Manager:
       Marker Topic: /visual_manager/right_active_marker
       Name: Right_active_area
       Namespaces:
-        {}
+        right_active: true
       Queue Size: 100
       Value: true
     - Class: rviz/TF
@@ -508,7 +556,7 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Eye:
-        X: 0
+        X: 5.6479621e-10
         Y: -2.5
         Z: 0
       Focus:
