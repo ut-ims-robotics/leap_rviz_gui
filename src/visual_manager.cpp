@@ -209,10 +209,10 @@ int main(int argc, char** argv)
 
 							move_group.plan(my_plan);
 							
-							ROS_INFO_STREAM("Touching PLAN");
-							ROS_INFO_STREAM(right_hand_palm_pose);
-							ROS_INFO_STREAM("Done PLAN");
-							ROS_INFO_STREAM(move_group.getCurrentPose());
+							// ROS_INFO_STREAM("Touching PLAN");
+							// ROS_INFO_STREAM(right_hand_palm_pose);
+							// ROS_INFO_STREAM("Done PLAN");
+							// ROS_INFO_STREAM(move_group.getCurrentPose());
 						}
 					}else if (hand_marker_collision(manager->getMarker("execute"), 0)){
 						
@@ -240,10 +240,10 @@ int main(int argc, char** argv)
 
 							move_group.move();
 
-							ROS_INFO_STREAM("Touching EXECUTE");
-							ROS_INFO_STREAM(right_hand_palm_pose);
-							ROS_INFO_STREAM("Done EXECUTE");
-							ROS_INFO_STREAM(move_group.getCurrentPose());
+							// ROS_INFO_STREAM("Touching EXECUTE");
+							// ROS_INFO_STREAM(right_hand_palm_pose);
+							// ROS_INFO_STREAM("Done EXECUTE");
+							// ROS_INFO_STREAM(move_group.getCurrentPose());
 						}
 					}
 					

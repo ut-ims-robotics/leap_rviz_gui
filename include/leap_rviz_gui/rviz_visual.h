@@ -239,10 +239,10 @@ bool close_menu(){
 	
 	if (dist_x > MENU_CLOSING_DIST_ || dist_y > MENU_CLOSING_DIST_){
 		activate_menu_ = false;
-    ROS_INFO_STREAM("-----------------------");
-    ROS_INFO_STREAM(dist_x);
-    ROS_INFO_STREAM(dist_y);
-    ROS_INFO_STREAM("-----------------------");
+    // ROS_INFO_STREAM("-----------------------");
+    // ROS_INFO_STREAM(dist_x);
+    // ROS_INFO_STREAM(dist_y);
+    // ROS_INFO_STREAM("-----------------------");
     
 		return true;
 	}
@@ -266,7 +266,7 @@ void changeScale(){
 	
   new_gain_ = dif_org * 20.0;
   set_new_gain_ = true;
-  ROS_INFO_STREAM(marker_vec_[n_scale].pose.position.z);
+  //ROS_INFO_STREAM(marker_vec_[n_scale].pose.position.z);
   pub_vec_[n_scale].publish(marker_vec_[n_scale]);
 }
 
@@ -419,7 +419,8 @@ geometry_msgs::Point transformBetweenFrames(geometry_msgs::Point p, const std::s
 void leapFilCallback(const leap_motion::Human& msg){
 	left_ = msg.left_hand;
 	right_ = msg.right_hand;
-
+  int i = 0;
+  
   if (msg.left_hand.is_present){
         int n = marker_map_["custom_left"];
         visualization_msgs::Marker m = marker_vec_[n];
@@ -475,6 +476,16 @@ void leapFilCallback(const leap_motion::Human& msg){
         //marker_vec[n].pose.position.y = m.pose.position.x + asin(radToDeg(roll)) * distToHandC;
         
         pub_vec_[n].publish(marker_vec_[n]);
+
+        //ROS_INFO_STREAM(left_.gesture_list.size());
+        // if (left_.gesture_list.size() > 0){
+        //   ROS_INFO_STREAM("new left:");
+        //   for (i = 0; i < left_.gesture_list.size(); i++){
+        //     ROS_INFO_STREAM(left_.gesture_list[i].gesture_type);
+        //   }
+        // }
+        // // ROS_INFO_STREAM("pinch left:");
+        // ROS_INFO_STREAM(left_.pinch_strength);
   }
 
   if (msg.right_hand.is_present){
@@ -523,10 +534,14 @@ void leapFilCallback(const leap_motion::Human& msg){
       // ROS_INFO_STREAM(yaw);
 
 
-      //!!!! make goal_state/robot arm to follow right hand
       pub_vec_[n].publish(marker_vec_[n]);
+    
+      //!!!! make goal_state/robot arm to follow right hand
+      //ROS_INFO_STREAM(right_.pinch_strength);
+      if (right_.pinch_strength > 0.9){
+        goal_state_pose_.pose = m.pose;
+      }
       
-      goal_state_pose_.pose = m.pose;
 
       n = marker_map_["right_active"];
       marker_vec_[n].pose = m.pose;
@@ -536,6 +551,17 @@ void leapFilCallback(const leap_motion::Human& msg){
       // n = marker_map_["hand_marker"];
       // marker_vec_[n].pose = m.pose;
       // pub_vec_[n].publish(marker_vec_[n]);
+      
+      //ROS_INFO_STREAM(right_.gesture_list.size());
+      
+      //     if (right_.gesture_list.size() > 0){
+      //     ROS_INFO_STREAM("new right:");
+      //     for (i = 0; i < right_.gesture_list.size(); i++){
+      //       ROS_INFO_STREAM(right_.gesture_list[i].gesture_type);
+      //     }   
+      // }
+      // ROS_INFO_STREAM("pinch right:");
+      // ROS_INFO_STREAM(right_.pinch_strength);
       
   }
 
