@@ -42,12 +42,6 @@ public:
     body_frame_rot_pitch_ = 0;
     body_frame_rot_yaw_ = M_PI;
 
-    released_left_ = true;
-    released_right_ = true;
-    released_up_ = true;
-    released_down_ = true;
-
-
   };
 
 
@@ -119,29 +113,6 @@ visualization_msgs::Marker getCustomRight(){
   return marker_vec_[n];
 }
 
-/*dir
-0 = left
-1 = right
-2 = up
-3 = down
-*/
-void setReleased(int dir, bool b){
-  switch(dir){
-    case 0:
-      released_left_ = b;
-      break;
-    case 1:
-      released_right_ = b;
-      break;
-    case 2:
-      released_up_ = b;
-      break;
-    case 3:
-      released_down_ = b;
-      break;
-  }
-}
-
 
 //FUNCTIONS
 void setGainAdd(double n){
@@ -151,6 +122,16 @@ void setGainAdd(double n){
 	if (gain_y_ < 3){
 	    gain_y_ = ORG_GAIN_Y_ + n;
 	}
+}
+
+void resetGain(){
+	gain_x_ = ORG_GAIN_X_;
+  gain_z_ = ORG_GAIN_Z_;
+  gain_y_ = ORG_GAIN_Y_;
+  
+  int n_scale = marker_map_["scale"];
+  marker_vec_[n_scale].pose.position.z = DIST_MENU_Z_;
+
 }
 
 void publishMarkers(){
@@ -180,7 +161,11 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["scale_text"];
       pub_vec_[n].publish(marker_vec_[n]);
-      
+      n = marker_map_["gain_text"];
+      // std::setprecision(2)
+      marker_vec_[n].text = std::to_string(gain_x_ - ORG_GAIN_X_ + 1);
+      pub_vec_[n].publish(marker_vec_[n]);
+
       n = marker_map_["camera"];
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["camera_text"];
@@ -282,17 +267,6 @@ void checkCamStatus(){
 
 }
 
-// float radToDeg(float rad){
-//   return rad * 180 / M_PI;
-// }
-
-
-void printFrameRot(){
-  ROS_INFO_STREAM(body_frame_rot_roll_);
-  ROS_INFO_STREAM(body_frame_rot_pitch_);
-  ROS_INFO_STREAM(body_frame_rot_yaw_);
-}
-
 void handFramePublish(){
   
   static tf::TransformBroadcaster br;
@@ -304,7 +278,7 @@ void handFramePublish(){
   transform.setRotation(q);
 
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "body", "leap_hands"));
-  // printFrameRot();
+  
 }
 
 
@@ -321,20 +295,9 @@ void framePublish(){
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "body"));
   
   handFramePublish();
-  // printFrameRot();
+  
 }
 
-
-
-// double calc3rdPoint(double dist, double a, double b ){
-
-//   /* 
-//   dist2 = (a)2 + (b)2 + (C)2
-//   (C)2 = dist2 - (a)2 - (b)2
-//   C = sqrt(dist2 - (a)2 - (b)2)
-//   */
-//   return sqrt(pow(dist, 2) - pow(a, 2) - pow(b, 2));
-// }
 
 /*
 dir
@@ -349,8 +312,6 @@ void setNewCamTra(int dir, int n){
   cam_mov = cam_tra_.trajectory[0];
   double dist = 2.5;
 
-
-
   geometry_msgs::TransformStamped ts;
   geometry_msgs::Transform transform;
 
@@ -359,15 +320,13 @@ void setNewCamTra(int dir, int n){
       body_frame_rot_yaw_ += M_PI / n;
       body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
-      // printFrameRot();
-      
+
       break;
     
     case 1: 
       body_frame_rot_yaw_ -= M_PI / n;
       body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
-      //  printFrameRot();
       
       break;
     
@@ -375,14 +334,12 @@ void setNewCamTra(int dir, int n){
       body_frame_rot_roll_ += M_PI / n;
       body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
-      //  printFrameRot();
 
       break;
     case 3:
       body_frame_rot_roll_ -= M_PI / n;
       body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
-      //  printFrameRot();
 
       break;
     
@@ -411,10 +368,6 @@ geometry_msgs::Point transformBetweenFrames(geometry_msgs::Point p, const std::s
 }
 
 
-
-
-
-
 //CALLBACKS
 void leapFilCallback(const leap_motion::Human& msg){
 	left_ = msg.left_hand;
@@ -431,8 +384,6 @@ void leapFilCallback(const leap_motion::Human& msg){
         m.pose.position.z = left_.palm_center.z * gain_z_;
 
         //ROS_INFO_STREAM(marker.pose.position);
-
-
         
         //getting left hand orientation
         float roll = left_.roll;
@@ -484,8 +435,18 @@ void leapFilCallback(const leap_motion::Human& msg){
         //     ROS_INFO_STREAM(left_.gesture_list[i].gesture_type);
         //   }
         // }
-        // // ROS_INFO_STREAM("pinch left:");
-        // ROS_INFO_STREAM(left_.pinch_strength);
+
+        //Resetting gain if left pinch
+        if (left_.pinch_strength > 0.97){
+          //ROS_INFO_STREAM("RESET SCALER");
+          resetGain();
+          // ROS_INFO_STREAM(left_.pinch_strength);
+        }
+        // if (left_.grab_strength > 0.3){
+        //   ROS_INFO_STREAM("grab left:");
+        //   ROS_INFO_STREAM(left_.grab_strength);
+        // }
+        
   }
 
   if (msg.right_hand.is_present){
@@ -538,7 +499,7 @@ void leapFilCallback(const leap_motion::Human& msg){
     
       //!!!! make goal_state/robot arm to follow right hand
       //ROS_INFO_STREAM(right_.pinch_strength);
-      if (right_.pinch_strength > 0.9){
+      if (right_.pinch_strength > 0.97){
         goal_state_pose_.pose = m.pose;
       }
       
@@ -584,38 +545,66 @@ private:
   void generalMarkerInit(){
 
     //markers init
-    //markerInit(shape, mesh, text, pos_x, pos_y, pos_z, sca_x, sca_y, sca_z, ns, r, g, b, a)
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "menu", 0.4f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ + 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "plan", 1.0f, 1.0f, 0.6f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "execute", 0.0f, 1.0f, 0.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ + 0.15, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "scale", 1.0f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ - 0.4, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "camera", 1.0f, 0.5f, 1.0f, 1.0f));
+    //markerInit(shape, mesh, text, pos_x, pos_y, pos_z, 
+    //            sca_x, sca_y, sca_z, ns, r, g, b, a)
+    
+    //OBJECTS AND THEIR CORRESPONDING TEXTS
 
-    marker_vec_.push_back(markerInit(TEXT_, "", "MENU", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "menu_text", 0.4f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(TEXT_, "", "PLAN", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "plan_text", 1.0f, 1.0f, 0.6f, 1.0f));
-    marker_vec_.push_back(markerInit(TEXT_, "", "EXECUTE", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ - 0.1, SCALE_X_, SCALE_Y_, SCALE_Z_, "execute_text", 0.0f, 1.0f, 0.0f, 1.0f));
-    marker_vec_.push_back(markerInit(TEXT_, "", "SCALE", DIST_MENU_X_ + 0.2, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "scale_text", 1.0f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "menu", 0.4f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ + 0.1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "plan", 1.0f, 1.0f, 0.6f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "execute", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ + 0.15, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "scale", 1.0f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ - 0.4, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "camera", 1.0f, 0.5f, 1.0f, 1.0f));
+
+    marker_vec_.push_back(markerInit(TEXT_, "", "MENU", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "menu_text", 0.4f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "PLAN", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "plan_text", 1.0f, 1.0f, 0.6f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "EXECUTE", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ - 0.1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "execute_text", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "SCALE", DIST_MENU_X_ + 0.2, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "scale_text", 1.0f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", std::to_string(gain_x_ - ORG_GAIN_X_ + 1), DIST_MENU_X_ + 0.3, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "gain_text", 1.0f, 0.8f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));
     
 
+    //CAMERA MOVEMENT
     
-    marker_vec_.push_back(markerInit(CUBE_, "", "", 0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_left", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE_, "", "", -0.3, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_right", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
-    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0.3, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "view_left", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", -0.3, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "view_right", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "view_down", 1.0f, 1.0f, 0.2f, 0.4f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "view_up", 1.0f, 1.0f, 0.2f, 0.4f));
     
-    marker_vec_.push_back(markerInit(SPHERE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "back", 0.4f, 1.0f, 1.0f, 0.4f));
-    marker_vec_.push_back(markerInit(TEXT_, "", "BACK", 0, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, SCALE_X_, SCALE_Y_, SCALE_Z_, "back_text", 0.4f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", 0, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "back", 0.4f, 1.0f, 1.0f, 0.4f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "BACK", 0, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "back_text", 0.4f, 1.0f, 1.0f, 1.0f));
     
 
+    //HANDS
   
-    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandLeft.stl", "", 0, 0, 0, 0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
-    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandRight.stl", "", 0, 0, 0, 0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandLeft.stl", "", 0, 0, 0, 
+                          0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandRight.stl", "", 0, 0, 0, 
+                          0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
 
 
 
-    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
-    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, 
+                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
+    marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, 
+                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
     
 
     fillMap();
@@ -791,20 +780,15 @@ private:
   double gain_z_;
 
 
-  const double ORG_GAIN_X_ = 2;
-  const double ORG_GAIN_Y_ = 2;
-  const double ORG_GAIN_Z_ = 1.5;
-
-
-  bool released_left_;
-  bool released_right_;
-  bool released_up_;
-  bool released_down_;
 
   //CONST
   // tf::Vector3 LEAP_ORG_POS_ = tf::Vector3(0, 0, 0.7);
   // tf::Quaternion LEAP_ORG_ROT_ = tf::Quaternion(3.14, 0, 0);
   const double MENU_CLOSING_DIST_ = 0.05;
+  const double ORG_GAIN_X_ = 2;
+  const double ORG_GAIN_Y_ = 2;
+  const double ORG_GAIN_Z_ = 1.5;
+
   const uint32_t SPHERE_ = visualization_msgs::Marker::SPHERE;
   const uint32_t CUBE_ = visualization_msgs::Marker::CUBE;
   const uint32_t TEXT_ = visualization_msgs::Marker::TEXT_VIEW_FACING;
