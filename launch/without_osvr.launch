@@ -87,7 +87,7 @@
 		<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
 		<!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
     <!-- Open a preconfigured RViz window -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/vm.rviz" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/leap_without_osvr.rviz" />
 
 	<!-- Launch our own script -->
 	<!-- <node name="tester" pkg="leap_rviz_gui" type="test.cpp" respawn="false" output="screen"></node> -->

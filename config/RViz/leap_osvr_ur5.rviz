@@ -4,13 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MarkerArray1
-        - /TF1/Tree1
-        - /Axes_body1
-        - /Axes_world1
         - /OSVR Plugin for RViz1
-        - /OSVR Plugin for RViz1/Offset1
-        - /Markers1
       Splitter Ratio: 0.5
     Tree Height: 480
   - Class: rviz/Selection
@@ -32,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
   - Class: rviz_visual_tools/RvizVisualToolsGui
     Name: RvizVisualToolsGui
 Visualization Manager:
@@ -307,27 +301,6 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 1
-    - Class: rviz/Axes
-      Enabled: false
-      Length: 1
-      Name: Axes_leap_hands
-      Radius: 0.0500000007
-      Reference Frame: leap_hands
-      Value: false
-    - Class: rviz/Axes
-      Enabled: false
-      Length: 1
-      Name: Axes_body
-      Radius: 0.0500000007
-      Reference Frame: body
-      Value: false
-    - Class: rviz/Axes
-      Enabled: false
-      Length: 0.5
-      Name: Axes_world
-      Radius: 0.100000001
-      Reference Frame: <Fixed Frame>
-      Value: false
     - Class: rviz/TF
       Enabled: false
       Frame Timeout: 15
@@ -344,24 +317,7 @@ Visualization Manager:
       Value: false
     - Class: OSVR Plugin for RViz
       Enabled: true
-      Follow RViz camera: false
-      Fullscreen: true
       Name: OSVR Plugin for RViz
-      OSVR tf frame: /rviz_plugin_osvr/head
-      Offset:
-        X: 0
-        Y: -1
-        Z: 0
-      Publish tf: true
-      Reset orientation: false
-      Scale:
-        X: 1
-        Y: 1
-        Z: 1
-      Screen name: HDMI-0
-      Target frame: body
-      Use tracker: false
-      Value: true
     - Class: rviz/Group
       Displays:
         - Class: rviz/Group
@@ -371,7 +327,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/custom_left_marker
               Name: Leap_l_hand_w_gain
               Namespaces:
-                custom_left: true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -387,7 +343,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/left_active_marker
               Name: Left_active_area
               Namespaces:
-                left_active: true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -395,7 +351,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/right_active_marker
               Name: Right_active_area
               Namespaces:
-                right_active: true
+                {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -407,7 +363,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/execute_marker
               Name: Execute_marker
               Namespaces:
-                execute: true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -415,7 +371,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/execute_text_marker
               Name: Execute_text_marker
               Namespaces:
-                execute_text: true
+                {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -427,7 +383,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/plan_marker
               Name: Plan_marker
               Namespaces:
-                plan: true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -435,7 +391,7 @@ Visualization Manager:
               Marker Topic: /visual_manager/plan_text_marker
               Name: Plan_text_marker
               Namespaces:
-                plan_text: true
+                {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -562,6 +518,31 @@ Visualization Manager:
           Name: Menu
       Enabled: true
       Name: Markers
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Axes
+          Enabled: true
+          Length: 1
+          Name: Axes_leap_hands
+          Radius: 0.0500000007
+          Reference Frame: leap_hands
+          Value: true
+        - Class: rviz/Axes
+          Enabled: true
+          Length: 1
+          Name: Axes_body
+          Radius: 0.0500000007
+          Reference Frame: body
+          Value: true
+        - Class: rviz/Axes
+          Enabled: true
+          Length: 0.5
+          Name: Axes_world
+          Radius: 0.100000001
+          Reference Frame: <Fixed Frame>
+          Value: true
+      Enabled: false
+      Name: Axes
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -640,5 +621,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1855
-  X: 1985
+  X: 65
   Y: 24
