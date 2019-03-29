@@ -169,6 +169,12 @@ void publishMarkers(){
       
       n = marker_map_["scale"];
       pub_vec_[n].publish(marker_vec_[n]);
+      
+      n = marker_map_["scale_arrow_up"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["scale_arrow_down"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      
       n = marker_map_["scale_text"];
       pub_vec_[n].publish(marker_vec_[n]);
       
@@ -176,6 +182,9 @@ void publishMarkers(){
       //marker_vec_[n].text = gainFormater(gain_x_ - ORG_GAIN_X_ + 1);
       marker_vec_[n].text = gainFormater(gain_x_);
       pub_vec_[n].publish(marker_vec_[n]);
+
+
+
 
       n = marker_map_["camera"];
       pub_vec_[n].publish(marker_vec_[n]);
@@ -557,7 +566,7 @@ private:
 
     //markers init
     //markerInit(shape, mesh, text, pos_x, pos_y, pos_z, 
-    //            sca_x, sca_y, sca_z, ns, r, g, b, a)
+    //           sca_x, sca_y, sca_z, ns, r, g, b, a)
     
     //OBJECTS AND THEIR CORRESPONDING TEXTS
 
@@ -585,6 +594,11 @@ private:
     marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));
     
+    marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          0.03, 0.07, 0, 0, -0.2, "scale_arrow_up", 1.0f, 1.0f, 1.0f, 1.0f));
+    marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          0.03, 0.07, 0, 0, 0.2, "scale_arrow_down", 1.0f, 1.0f, 1.0f, 1.0f));
+
 
     //CAMERA MOVEMENT
     
@@ -683,7 +697,8 @@ private:
   }
 
   // ___ HELPER FUNCTIONS ___
-  visualization_msgs::Marker markerInit(uint32_t shape, const std::string& mesh, const std::string& text, float_t pos_x, float_t pos_y, float_t pos_z, float_t sca_x, float_t sca_y, float_t sca_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
+  visualization_msgs::Marker markerInit(uint32_t shape, const std::string& mesh, const std::string& text, float_t pos_x, float_t pos_y, float_t pos_z, 
+          float_t sca_x, float_t sca_y, float_t sca_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
     visualization_msgs::Marker marker;
 
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
@@ -719,6 +734,62 @@ private:
     marker.scale.x = sca_x;
     marker.scale.y = sca_y;
     marker.scale.z = sca_z;
+
+    // Set the color -- be sure to set alpha to something non-zero!
+    marker.color.r = r;
+    marker.color.g = g;
+    marker.color.b = b;
+    marker.color.a = a;
+
+    marker.lifetime = ros::Duration(0.1);
+
+
+    return marker;
+  }
+
+  visualization_msgs::Marker arrowMarkerInit(float_t pos_x, float_t pos_y, float_t pos_z, 
+          float_t shaft_d, float_t head_d, float_t head_l,float_t start_z,float_t end_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
+    visualization_msgs::Marker marker;
+
+    // Set the frame ID and timestamp.  See the TF tutorials for information on these.
+    marker.header.frame_id = "leap_hands";
+    //marker.header.frame_id = "body";
+    
+    // Set the namespace and id for this marker.  This serves to create a unique ID
+    // Any marker sent with the same namespace and id will overwrite the old one
+    //marker.ns = "planning_ball";
+    marker.ns = ns;
+    marker.id = 0;
+
+    // Set the marker type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
+    marker.type = ARROW_;
+
+    // Set the marker action.  Options are ADD, DELETE, and new in ROS Indigo: 3 (DELETEALL)
+    marker.action = visualization_msgs::Marker::ADD;
+
+    // Set the pose of the marker.  This is a full 6DOF pose relative to the frame/time specified in the header
+    marker.pose.position.x = pos_x; //0.2;
+    marker.pose.position.y = pos_y; //0.2;
+    marker.pose.position.z = pos_z; //0.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    geometry_msgs::Point p;
+    p.x = 0.0;
+    p.y = 0.0;
+    p.z = start_z;
+
+    marker.points.push_back(p);
+    p.z = end_z;
+    marker.points.push_back(p);
+    
+
+    // Set the scale of the marker -- 1x1x1 here means 1m on a side
+    marker.scale.x = shaft_d;
+    marker.scale.y = head_d;
+    marker.scale.z = head_l;
 
     // Set the color -- be sure to set alpha to something non-zero!
     marker.color.r = r;
@@ -804,6 +875,9 @@ private:
   const uint32_t CUBE_ = visualization_msgs::Marker::CUBE;
   const uint32_t TEXT_ = visualization_msgs::Marker::TEXT_VIEW_FACING;
   const uint32_t MESH_ = visualization_msgs::Marker::MESH_RESOURCE;
+  const uint32_t ARROW_ = visualization_msgs::Marker::ARROW;
+  
+
   const float_t DIST_MENU_X_ = 0.2;
 	const float_t DIST_MENU_Y_ = 0.4;
 	const float_t DIST_MENU_Z_ = 0;
