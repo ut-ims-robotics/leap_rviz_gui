@@ -3,11 +3,13 @@
 #include "ros/ros.h"
 #include "visualization_msgs/Marker.h"
 #include "geometry_msgs/Pose.h"
+#include "geometry_msgs/TransformStamped.h"
 #include <vector>
 #include <map>
 #include <leap_motion/Human.h>
 
-#include "geometry_msgs/TransformStamped.h"
+#include <iomanip>
+//#include <iostream>
 // #include <tf2/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 // #include <tf/static_transform_broadcaster.h>
@@ -134,6 +136,14 @@ void resetGain(){
 
 }
 
+std::string gainFormater(double gain){
+  std::ostringstream streamObj;
+  streamObj << std::fixed;
+  streamObj << std::setprecision(2);
+  streamObj << gain;
+  return streamObj.str();
+}
+
 void publishMarkers(){
   int n;
 
@@ -161,9 +171,10 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["scale_text"];
       pub_vec_[n].publish(marker_vec_[n]);
+      
       n = marker_map_["gain_text"];
-      // std::setprecision(2)
-      marker_vec_[n].text = std::to_string(gain_x_ - ORG_GAIN_X_ + 1);
+      //marker_vec_[n].text = gainFormater(gain_x_ - ORG_GAIN_X_ + 1);
+      marker_vec_[n].text = gainFormater(gain_x_);
       pub_vec_[n].publish(marker_vec_[n]);
 
       n = marker_map_["camera"];
@@ -569,7 +580,7 @@ private:
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "execute_text", 0.0f, 1.0f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(TEXT_, "", "SCALE", DIST_MENU_X_ + 0.2, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "scale_text", 1.0f, 1.0f, 1.0f, 1.0f));
-    marker_vec_.push_back(markerInit(TEXT_, "", std::to_string(gain_x_ - ORG_GAIN_X_ + 1), DIST_MENU_X_ + 0.3, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, 
+    marker_vec_.push_back(markerInit(TEXT_, "", gainFormater(gain_x_ - ORG_GAIN_X_ + 1), DIST_MENU_X_ + 0.3, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "gain_text", 1.0f, 0.8f, 1.0f, 1.0f));
     marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));

@@ -4,7 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /OSVR Plugin for RViz1
+        - /OSVR Plugin for RViz1/Offset1
       Splitter Ratio: 0.5
     Tree Height: 480
   - Class: rviz/Selection
@@ -317,7 +317,24 @@ Visualization Manager:
       Value: false
     - Class: OSVR Plugin for RViz
       Enabled: true
+      Follow RViz camera: false
+      Fullscreen: true
       Name: OSVR Plugin for RViz
+      OSVR tf frame: /rviz_plugin_osvr/head
+      Offset:
+        X: 0
+        Y: -1
+        Z: 0
+      Publish tf: true
+      Reset orientation: false
+      Scale:
+        X: 1
+        Y: 1
+        Z: 1
+      Screen name: HDMI-0
+      Target frame: body
+      Use tracker: false
+      Value: true
     - Class: rviz/Group
       Displays:
         - Class: rviz/Group
@@ -412,6 +429,14 @@ Visualization Manager:
               Name: Scaler_marker
               Namespaces:
                 scale: true
+              Queue Size: 100
+              Value: true
+            - Class: rviz/Marker
+              Enabled: true
+              Marker Topic: /visual_manager/gain_text_marker
+              Name: Gain_text_marker
+              Namespaces:
+                gain_text: true
               Queue Size: 100
               Value: true
           Enabled: true
@@ -569,20 +594,20 @@ Visualization Manager:
     Current:
       Class: rviz_animated_view_controller/Animated
       Control Mode: Orbit
-      Distance: 2.49999952
+      Distance: 2.5
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Eye:
-        X: 1.25607397e-14
-        Y: -2.49999928
-        Z: 1.49011612e-07
+        X: 0
+        Y: -2.5
+        Z: 0
       Focus:
-        X: 1.69406589e-21
+        X: 0
         Y: 0
-        Z: 4.47034779e-07
+        Z: 0
       Invert Z Axis: false
       Maintain Vertical Axis: true
       Mouse Enabled: true
