@@ -9,10 +9,7 @@
 #include <leap_motion/Human.h>
 
 #include <iomanip>
-//#include <iostream>
-// #include <tf2/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
-// #include <tf/static_transform_broadcaster.h>
 
 
 class Visuals
@@ -44,6 +41,7 @@ public:
     body_frame_rot_pitch_ = 0;
     body_frame_rot_yaw_ = M_PI;
 
+    number_of_view_points_ = 10000;
   };
 
 
@@ -312,7 +310,8 @@ void framePublish(){
   q.setRPY(body_frame_rot_roll_, body_frame_rot_pitch_, body_frame_rot_yaw_);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "body"));
+  // br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "body"));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "body"));
   
   handFramePublish();
   
@@ -326,7 +325,7 @@ dir
 2 -> up
 3 -> down
 */
-void setNewCamTra(int dir, int n){
+void setNewCamTra(int dir){
   rviz_animated_view_controller::CameraMovement cam_mov;
 
   cam_mov = cam_tra_.trajectory[0];
@@ -337,27 +336,27 @@ void setNewCamTra(int dir, int n){
 
   switch (dir){
     case 0:
-      body_frame_rot_yaw_ += M_PI / n;
+      body_frame_rot_yaw_ += M_PI / number_of_view_points_;
       body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
 
       break;
     
     case 1: 
-      body_frame_rot_yaw_ -= M_PI / n;
+      body_frame_rot_yaw_ -= M_PI / number_of_view_points_;
       body_frame_rot_yaw_ = fmod(body_frame_rot_yaw_, 2 * M_PI);
       framePublish();
       
       break;
     
     case 2:
-      body_frame_rot_roll_ += M_PI / n;
+      body_frame_rot_roll_ += M_PI / number_of_view_points_;
       body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
 
       break;
     case 3:
-      body_frame_rot_roll_ -= M_PI / n;
+      body_frame_rot_roll_ -= M_PI / number_of_view_points_;
       body_frame_rot_roll_ = fmod(body_frame_rot_roll_, 2 * M_PI);
       framePublish();
 
@@ -521,6 +520,7 @@ void leapFilCallback(const leap_motion::Human& msg){
       //ROS_INFO_STREAM(right_.pinch_strength);
       if (right_.pinch_strength > 0.97){
         goal_state_pose_.pose = m.pose;
+        //ROS_INFO_STREAM(right_.pinch_strength);
       }
       
 
@@ -690,9 +690,6 @@ private:
     // ROS_INFO_STREAM(cam_mov);
     
     cam_tra_.trajectory.push_back(cam_mov);
-    
-    // cam_tra.transition_time.secs = 3;
-    // cam_tra.eye.header.frame_id = "base_link";
 	
   }
 
@@ -861,6 +858,7 @@ private:
   double gain_y_;
   double gain_z_;
 
+  int number_of_view_points_;
 
 
   //CONST

@@ -132,29 +132,22 @@ int main(int argc, char** argv)
 
 	visual_tools.trigger();
 
-	//TF variables
-	tf2_ros::Buffer tfBuffer;
-	geometry_msgs::TransformStamped hand_to_world;
-	
+
+	//goal_state_update
 	ros::Publisher pub_goal_ee_link = 
-    node_handle.advertise<geometry_msgs::PoseStamped>("/rviz/moveit/move_marker/goal_ee_link", 1);
+    	node_handle.advertise<geometry_msgs::PoseStamped>("/rviz/moveit/move_marker/goal_ee_link", 1);
 	
 	ros::Publisher pub_update_goal_pose = 
-    node_handle.advertise<std_msgs::Empty>("/rviz/moveit/update_goal_state", 1);
-	std_msgs::Empty empty_cmd_msg;
+    	node_handle.advertise<std_msgs::Empty>("/rviz/moveit/update_goal_state", 1);
+	
 
-	// geometry_msgs::PoseStamped pose;
+	pub_update_goal_pose.publish(manager->getEmpty_msg());
+	pub_goal_ee_link.publish(manager->getGoal_state_pose());
 	pub_update_goal_pose.publish(manager->getEmpty_msg());
 
 	
-	pub_goal_ee_link.publish(manager->getGoal_state_pose());
-	pub_update_goal_pose.publish(empty_cmd_msg);
-	
 
-	
-  	tf::TransformListener tf_listener;
-
-	int number_of_view_points = 10000;	
+	//int number_of_view_points = 10000;	
 
 	while(ros::ok()){		
 		manager->publishMarkers();
@@ -173,7 +166,7 @@ int main(int argc, char** argv)
 				//goal_state_pose update
 				if (manager->getRight().is_present){
 					geometry_msgs::PoseStamped temp_pose_stmp = manager->getGoal_state_pose();
-					temp_pose_stmp.pose.position = manager->transformBetweenFrames(temp_pose_stmp.pose.position, "leap_hands", "world");
+					temp_pose_stmp.pose.position = manager->transformBetweenFrames(temp_pose_stmp.pose.position, "leap_hands", "base_link");
 					//tf_world_2_hand(temp_pose_stmp.pose.position);
 
 					pub_goal_ee_link.publish(temp_pose_stmp);
@@ -189,16 +182,19 @@ int main(int argc, char** argv)
 						
 						if (manager->getRight().is_present){
 							
-							geometry_msgs::Pose right_hand_palm_pose;
-							right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							geometry_msgs::Pose move_robot_to_pose;
+
+							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							move_robot_to_pose.position = manager->transformBetweenFrames(manager->getGoal_state_pose().pose.position, "leap_hands", "world");
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
-							right_hand_palm_pose.orientation.w = 1;
-						
-						
+							move_robot_to_pose.orientation.w = 1;
+							
+
+							
 							//robot planning
-							move_group.setPoseTarget(right_hand_palm_pose);
-						
+							move_group.setPoseTarget(move_robot_to_pose);
+
 							moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 							
 							geometry_msgs::PoseStamped markerArray_pose_stamped_new;
@@ -219,16 +215,18 @@ int main(int argc, char** argv)
 						if (manager->getRight().is_present){
 							
 
-							geometry_msgs::Pose right_hand_palm_pose;
-							right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							geometry_msgs::Pose move_robot_to_pose;
+
+
+							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getCustomRight().pose.position, "leap_hands", "world");
+							move_robot_to_pose.position = manager->transformBetweenFrames(manager->getGoal_state_pose().pose.position, "leap_hands", "world");
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
-							right_hand_palm_pose.orientation.w = 1;
+							move_robot_to_pose.orientation.w = 1;
 							
-
 							
 							//robot planning
-							move_group.setPoseTarget(right_hand_palm_pose);
+							move_group.setPoseTarget(move_robot_to_pose);
 						
 							moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
@@ -281,17 +279,13 @@ int main(int argc, char** argv)
 					manager->publishCam();
 					manager->checkCamStatus();	
 				}else {
-					//rviz_animated_view_controller::CameraTrajectory cam_tra = manager->getCam_tra();
-					// rviz_animated_view_controller::CameraMovement cam_mov;
-					// cam_mov = manager->getCam_tra().trajectory.pop_back();
 					
-  //if present missing
-					if (manager->getLeft().is_present ||
+ 					if (manager->getLeft().is_present ||
 						manager->getRight().is_present){
 						if (hand_marker_collision(manager->getMarker("view_left"), 0) ||
 							hand_marker_collision(manager->getMarker("view_left"), 1)){
 							
-							manager->setNewCamTra(0, number_of_view_points);
+							manager->setNewCamTra(0);
 							manager->setAdjust_camera(true);
 
 							// ROS_INFO_STREAM("Touching left");
@@ -299,30 +293,25 @@ int main(int argc, char** argv)
 						}else if (hand_marker_collision(manager->getMarker("view_right"), 0) ||
 							hand_marker_collision(manager->getMarker("view_right"), 1)){
 							
-							manager->setNewCamTra(1, number_of_view_points);
+							manager->setNewCamTra(1);
 							manager->setAdjust_camera(true);
-
-							//manager->frameChange();
 
 							// ROS_INFO_STREAM("Touching right");
 
 						}else if (hand_marker_collision(manager->getMarker("view_up"), 0) ||
 							hand_marker_collision(manager->getMarker("view_up"), 1)){
 							
-							manager->setNewCamTra(2, number_of_view_points);
+							manager->setNewCamTra(2);
 							manager->setAdjust_camera(true);
 
-							//manager->frameChange();
 
 							// ROS_INFO_STREAM("Touching up");
 
 						}else if (hand_marker_collision(manager->getMarker("view_down"), 0) ||
 							hand_marker_collision(manager->getMarker("view_down"), 1)){
 							
-							manager->setNewCamTra(3, number_of_view_points);
+							manager->setNewCamTra(3);
 							manager->setAdjust_camera(true);
-
-							//manager->frameChange();
 
 							// ROS_INFO_STREAM("Touching down");
 
