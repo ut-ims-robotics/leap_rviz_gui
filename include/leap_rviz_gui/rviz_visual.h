@@ -145,6 +145,7 @@ std::string gainFormater(double gain){
 void publishMarkers(){
   int n;
 
+
   switch (mode_){
     case 0:
       if (activate_menu_) {
@@ -189,6 +190,9 @@ void publishMarkers(){
       n = marker_map_["camera_text"];
       pub_vec_[n].publish(marker_vec_[n]);
 
+      n = marker_map_["instructions"];
+      pub_vec_[n].publish(marker_vec_[n]);  
+
       break;
 
 
@@ -207,9 +211,14 @@ void publishMarkers(){
       n = marker_map_["back_text"];
       pub_vec_[n].publish(marker_vec_[n]);
 
+      n = marker_map_["instructions"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
       break;
     default:
       mode_ = 0;
+
+    
   }
   
 }
@@ -427,44 +436,19 @@ void leapFilCallback(const leap_motion::Human& msg){
     
         marker_vec_[n] = m;
         
-        // ROS_INFO_STREAM("------------------------------");
-        // ROS_INFO_STREAM(roll);
-        // ROS_INFO_STREAM(radToDeg(roll));
-        // ROS_INFO_STREAM("------------------------------");
-        
-        // ROS_INFO_STREAM(rad2deg(roll));
-        // // //ROS_INFO_STREAM(pitch);
-        // ROS_INFO_STREAM(yaw);
-
         pub_vec_[n].publish(marker_vec_[n]);
 
         n = marker_map_["left_active"];
 
         marker_vec_[n].pose = m.pose;
-        
-        //marker_vec[n].pose.position.y = m.pose.position.y + sin(radToDeg(roll)) * distToHandC;
-        //marker_vec[n].pose.position.y = m.pose.position.x + asin(radToDeg(roll)) * distToHandC;
-        
+                
         pub_vec_[n].publish(marker_vec_[n]);
-
-        //ROS_INFO_STREAM(left_.gesture_list.size());
-        // if (left_.gesture_list.size() > 0){
-        //   ROS_INFO_STREAM("new left:");
-        //   for (i = 0; i < left_.gesture_list.size(); i++){
-        //     ROS_INFO_STREAM(left_.gesture_list[i].gesture_type);
-        //   }
-        // }
 
         //Resetting gain if left pinch
         if (left_.pinch_strength > 0.97){
-          //ROS_INFO_STREAM("RESET SCALER");
           resetGain();
-          // ROS_INFO_STREAM(left_.pinch_strength);
         }
-        // if (left_.grab_strength > 0.3){
-        //   ROS_INFO_STREAM("grab left:");
-        //   ROS_INFO_STREAM(left_.grab_strength);
-        // }
+
         
   }
 
@@ -503,46 +487,20 @@ void leapFilCallback(const leap_motion::Human& msg){
       m.pose.orientation.z = q.z();
   
       marker_vec_[n] = m;
-      
-      // ROS_INFO_STREAM("------------------------------");
-      // ROS_INFO_STREAM(roll);
-      // ROS_INFO_STREAM(radToDeg(roll));
-      // ROS_INFO_STREAM("------------------------------");
-      
-      // ROS_INFO_STREAM(rad2deg(roll));
-      // // //ROS_INFO_STREAM(pitch);
-      // ROS_INFO_STREAM(yaw);
-
+    
 
       pub_vec_[n].publish(marker_vec_[n]);
     
       //!!!! make goal_state/robot arm to follow right hand
-      //ROS_INFO_STREAM(right_.pinch_strength);
+
       if (right_.pinch_strength > 0.97){
         goal_state_pose_.pose = m.pose;
-        //ROS_INFO_STREAM(right_.pinch_strength);
       }
       
 
       n = marker_map_["right_active"];
       marker_vec_[n].pose = m.pose;
       pub_vec_[n].publish(marker_vec_[n]);
-      
-
-      // n = marker_map_["hand_marker"];
-      // marker_vec_[n].pose = m.pose;
-      // pub_vec_[n].publish(marker_vec_[n]);
-      
-      //ROS_INFO_STREAM(right_.gesture_list.size());
-      
-      //     if (right_.gesture_list.size() > 0){
-      //     ROS_INFO_STREAM("new right:");
-      //     for (i = 0; i < right_.gesture_list.size(); i++){
-      //       ROS_INFO_STREAM(right_.gesture_list[i].gesture_type);
-      //     }   
-      // }
-      // ROS_INFO_STREAM("pinch right:");
-      // ROS_INFO_STREAM(right_.pinch_strength);
       
   }
 
@@ -594,10 +552,20 @@ private:
     marker_vec_.push_back(markerInit(TEXT_, "", "VIEW", DIST_MENU_X_ - 0.4, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "camera_text", 1.0f, 0.5f, 1.0f, 1.0f));
     
+
+    
+    marker_vec_.push_back(markerInit(TEXT_, "", INSTRUCTIONS_, 0, 2, -1, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "instructions", 1.0f, 1.0f, 0.2f, 1.0f));
+
+
+
+    //SCALER ARROWS
+
     marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
                           0.03, 0.07, 0, 0, -0.2, "scale_arrow_up", 1.0f, 1.0f, 1.0f, 1.0f));
     marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
                           0.03, 0.07, 0, 0, 0.2, "scale_arrow_down", 1.0f, 1.0f, 1.0f, 1.0f));
+
 
 
     //CAMERA MOVEMENT
@@ -887,7 +855,9 @@ private:
   const float_t SCALE_Z_ = 0.1;
   const float_t SCALE_START_POS_ = DIST_MENU_Z_;
   const double CAM_MOV_TOLERANCE_ = 0.1;
-  //const double DIST_HAND_C_ = 0.2;
+  
+  std::string INSTRUCTIONS_ = "Instruction:\n Using left hand (RED) user can:\n change the scale (up and down)\n open a menu and choose to plan or execute current goal pose (right hand needs to be present)\n reset scaler by pinching\n Using right hand (BLUE) user can:\n controll goal state by pinching\n change view by touching view marker";
+
 };
 
 // #endif
