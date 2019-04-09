@@ -495,6 +495,7 @@ void leapFilCallback(const leap_motion::Human& msg){
 
       if (right_.pinch_strength > 0.97){
         goal_state_pose_.pose = m.pose;
+//        goal_state_pose_.pose.orientation = q;
       }
       
 
@@ -604,7 +605,7 @@ private:
 
     //goal_state init
     goal_state_pose_.header.frame_id = "/base_link";
-    goal_state_pose_.pose.orientation.w = 1.0;
+    //goal_state_pose_.pose.orientation.w = 1.0;
 
   }
 

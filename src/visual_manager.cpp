@@ -188,7 +188,9 @@ int main(int argc, char** argv)
 							move_robot_to_pose.position = manager->transformBetweenFrames(manager->getGoal_state_pose().pose.position, "leap_hands", "world");
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
-							move_robot_to_pose.orientation.w = 1;
+							//ROS_INFO_STREAM(manager->getGoal_state_pose());
+							move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
+							// move_robot_to_pose.orientation.w = 1;
 							
 
 							
@@ -222,7 +224,9 @@ int main(int argc, char** argv)
 							move_robot_to_pose.position = manager->transformBetweenFrames(manager->getGoal_state_pose().pose.position, "leap_hands", "world");
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
-							move_robot_to_pose.orientation.w = 1;
+							move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
+							
+							//move_robot_to_pose.orientation.w = 1;
 							
 							
 							//robot planning

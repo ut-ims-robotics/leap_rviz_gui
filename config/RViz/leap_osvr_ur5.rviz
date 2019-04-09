@@ -4,7 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /OSVR Plugin for RViz1
         - /OSVR Plugin for RViz1/Offset1
       Splitter Ratio: 0.5
     Tree Height: 527
@@ -27,9 +26,11 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
   - Class: rviz_visual_tools/RvizVisualToolsGui
     Name: RvizVisualToolsGui
+Toolbars:
+  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -157,6 +158,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          base_link_box:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           ee_link:
             Alpha: 1
             Show Axes: false
@@ -250,6 +256,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
           base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          base_link_box:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -558,6 +569,18 @@ Visualization Manager:
               Value: true
           Enabled: true
           Name: Menu
+        - Class: rviz/Group
+          Displays:
+            - Class: rviz/Marker
+              Enabled: true
+              Marker Topic: /visual_manager/instructions_marker
+              Name: Instructions_marker
+              Namespaces:
+                instructions: true
+              Queue Size: 100
+              Value: true
+          Enabled: true
+          Name: Instuctions
       Enabled: true
       Name: Markers
     - Class: rviz/Group
@@ -618,7 +641,7 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Eye:
-        X: 0
+        X: 1.98616306e-08
         Y: -2.5
         Z: 0
       Focus:
