@@ -41,6 +41,10 @@ public:
     body_frame_rot_pitch_ = 0;
     body_frame_rot_yaw_ = M_PI;
 
+    ori_arrow_roll_ = 0;
+    ori_arrow_pitch_ = 0;
+    ori_arrow_yaw_ = 0;
+
     number_of_view_points_ = 10000;
   };
 
@@ -113,6 +117,11 @@ visualization_msgs::Marker getCustomRight(){
   return marker_vec_[n];
 }
 
+geometry_msgs::Quaternion getEeOrientation(){
+  int n = marker_map_["ori_arrow"];
+  return marker_vec_[n].pose.orientation;
+}
+
 
 //FUNCTIONS
 void setGainAdd(double n){
@@ -159,6 +168,11 @@ void publishMarkers(){
         n = marker_map_["execute_text"];
         pub_vec_[n].publish(marker_vec_[n]);
 
+        n = marker_map_["ee_control"];
+        pub_vec_[n].publish(marker_vec_[n]);
+        n = marker_map_["ee_control_text"];
+        pub_vec_[n].publish(marker_vec_[n]);
+
       }else{
         n = marker_map_["menu"];
         pub_vec_[n].publish(marker_vec_[n]);
@@ -193,6 +207,10 @@ void publishMarkers(){
       n = marker_map_["instructions"];
       pub_vec_[n].publish(marker_vec_[n]);  
 
+
+      n = marker_map_["ori_arrow"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
       break;
 
 
@@ -215,6 +233,27 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
 
       break;
+
+    case 2:
+      
+      n = marker_map_["ori_arrow"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
+      n = marker_map_["view_left"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_right"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_down"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_up"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["back"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["back_text"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
+      break;
+
     default:
       mode_ = 0;
 
@@ -338,10 +377,10 @@ void setNewCamTra(int dir){
   rviz_animated_view_controller::CameraMovement cam_mov;
 
   cam_mov = cam_tra_.trajectory[0];
-  double dist = 2.5;
+  //double dist = 2.5;
 
-  geometry_msgs::TransformStamped ts;
-  geometry_msgs::Transform transform;
+  //geometry_msgs::TransformStamped ts;
+  //geometry_msgs::Transform transform;
 
   switch (dir){
     case 0:
@@ -372,8 +411,62 @@ void setNewCamTra(int dir){
       break;
     
   }
-
+  //!!!!VAJALIK!=?????
   cam_tra_.trajectory[0] = cam_mov;
+}
+
+/*
+dir
+0 -> left
+1 -> right
+2 -> up
+3 -> down
+*/
+void setNewOri(int dir){
+  
+  int n = marker_map_["ori_arrow"];
+  visualization_msgs::Marker ori_marker = marker_vec_[n];
+
+  switch (dir){
+    //LEFT
+    case 0:
+      
+      ori_arrow_yaw_ -= M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_yaw_ = fmod(ori_arrow_yaw_, 2 * M_PI);
+
+      break;
+    //RIGHT
+    case 1: 
+      
+      ori_arrow_yaw_ += M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_yaw_ = fmod(ori_arrow_yaw_, 2 * M_PI);
+      
+      break;
+    //UP
+    case 2:
+      ori_arrow_roll_ -= M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_roll_ = fmod(ori_arrow_roll_, 2 * M_PI);
+
+      break;
+    //DOWN
+    case 3:
+      ori_arrow_roll_ += M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_roll_ = fmod(ori_arrow_roll_, 2 * M_PI);
+
+      break;
+    
+  }
+  
+  tf::Quaternion q;
+  q.setRPY(ori_arrow_roll_, ori_arrow_pitch_, ori_arrow_yaw_);
+  q.normalize();
+  ori_marker.pose.orientation.x = q.x();
+  ori_marker.pose.orientation.y = q.y();
+  ori_marker.pose.orientation.z = q.z();
+  ori_marker.pose.orientation.w = q.w();
+  marker_vec_[n] = ori_marker;
+  pub_vec_[n].publish(marker_vec_[n]);
+
 }
 
 
@@ -400,108 +493,132 @@ geometry_msgs::Point transformBetweenFrames(geometry_msgs::Point p, const std::s
 void leapFilCallback(const leap_motion::Human& msg){
 	left_ = msg.left_hand;
 	right_ = msg.right_hand;
-  int i = 0;
+  //int i = 0;
   
   if (msg.left_hand.is_present){
-        int n = marker_map_["custom_left"];
-        visualization_msgs::Marker m = marker_vec_[n];
-        
-        //getting a left hand pos and multiplying it with the gain
-        m.pose.position.x = left_.palm_center.x * gain_x_;
-        m.pose.position.y = left_.palm_center.y * gain_y_;
-        m.pose.position.z = left_.palm_center.z * gain_z_;
-
-        //ROS_INFO_STREAM(marker.pose.position);
-        
-        //getting left hand orientation
-        float roll = left_.roll;
-        float pitch = left_.pitch;
-        float yaw = left_.yaw;
-
-        //checking orientation, Leap Motion has a problem there with turing hands around
-        tf2::Quaternion q;
-        if (abs(yaw) > M_PI/2){
-            q.setRPY(-(roll), pitch, yaw);            
-        }else{
-            q.setRPY(-(roll), -(pitch), yaw);                
-        }
-
-        q.normalize();
-        
-        
-        m.pose.orientation.w = q.w();
-        m.pose.orientation.x = q.x();
-        m.pose.orientation.y = q.y();
-        m.pose.orientation.z = q.z();
+    int n = marker_map_["custom_left"];
+    visualization_msgs::Marker m = marker_vec_[n];
     
-        marker_vec_[n] = m;
-        
-        pub_vec_[n].publish(marker_vec_[n]);
+    //getting a left hand pos and multiplying it with the gain
+    m.pose.position.x = left_.palm_center.x * gain_x_;
+    m.pose.position.y = left_.palm_center.y * gain_y_;
+    m.pose.position.z = left_.palm_center.z * gain_z_;
 
-        n = marker_map_["left_active"];
+    //ROS_INFO_STREAM(marker.pose.position);
+    
+    //getting left hand orientation
+    float roll = left_.roll;
+    float pitch = left_.pitch;
+    float yaw = left_.yaw;
 
-        marker_vec_[n].pose = m.pose;
-                
-        pub_vec_[n].publish(marker_vec_[n]);
+    //checking orientation, Leap Motion has a problem there with turing hands around
+    tf2::Quaternion q;
+    if (abs(yaw) > M_PI/2){
+        q.setRPY(-(roll), pitch, yaw);            
+    }else{
+        q.setRPY(-(roll), -(pitch), yaw);                
+    }
 
-        //Resetting gain if left pinch
-        if (left_.pinch_strength > 0.97){
-          resetGain();
-        }
+    q.normalize();
+    
+    
+    m.pose.orientation.w = q.w();
+    m.pose.orientation.x = q.x();
+    m.pose.orientation.y = q.y();
+    m.pose.orientation.z = q.z();
+
+    marker_vec_[n] = m;
+    
+    
+    pub_vec_[n].publish(marker_vec_[n]);
+    
+    
+    n = marker_map_["left_active"];
+
+    marker_vec_[n].pose = m.pose;
+            
+    pub_vec_[n].publish(marker_vec_[n]);
+
+    //Resetting gain if left pinch
+    if (left_.pinch_strength > 0.97){
+      resetGain();
+    }
 
         
   }
 
   if (msg.right_hand.is_present){
-      int n = marker_map_["custom_right"];
-      visualization_msgs::Marker m = marker_vec_[n];
-        
-      //getting a right hand pos and multiplying it with the gain
-      m.pose.position.x = right_.palm_center.x * gain_x_;
-      m.pose.position.y = right_.palm_center.y * gain_y_;
-      m.pose.position.z = right_.palm_center.z * gain_z_;
-
-      //ROS_INFO_STREAM(marker.pose.position);
-
-
+    int n = marker_map_["custom_right"];
+    visualization_msgs::Marker m = marker_vec_[n];
       
-      //getting right hand orientation
-      float roll = right_.roll;
-      float pitch = right_.pitch;
-      float yaw = right_.yaw;
+    //getting a right hand pos and multiplying it with the gain
+    m.pose.position.x = right_.palm_center.x * gain_x_;
+    m.pose.position.y = right_.palm_center.y * gain_y_;
+    m.pose.position.z = right_.palm_center.z * gain_z_;
 
-      //checking orientation, Leap Motion has a problem with turing hands around yaw
-      tf2::Quaternion q;
-      if (abs(yaw) > M_PI/2){
-          q.setRPY(-(roll), pitch, yaw);            
-      }else{
-          q.setRPY(-(roll), -(pitch), yaw);                
-      }
+    //ROS_INFO_STREAM(marker.pose.position);
 
-      q.normalize();
-      
-      
-      m.pose.orientation.w = q.w();
-      m.pose.orientation.x = q.x();
-      m.pose.orientation.y = q.y();
-      m.pose.orientation.z = q.z();
+
+    
+    //getting right hand orientation
+    float roll = right_.roll;
+    float pitch = right_.pitch;
+    float yaw = right_.yaw;
+
+    //checking orientation, Leap Motion has a problem with turing hands around yaw
+    tf2::Quaternion q;
+    if (abs(yaw) > M_PI/2){
+      q.setRPY(-(roll), pitch, yaw);            
+    }else{
+      q.setRPY(-(roll), -(pitch), yaw);                
+    }
+    
+    q.normalize();
+    
+    
+    m.pose.orientation.w = q.w();
+    m.pose.orientation.x = q.x();
+    m.pose.orientation.y = q.y();
+    m.pose.orientation.z = q.z();
+
+    marker_vec_[n] = m;
   
-      marker_vec_[n] = m;
-    
 
-      pub_vec_[n].publish(marker_vec_[n]);
     
-      //!!!! make goal_state/robot arm to follow right hand
+    pub_vec_[n].publish(marker_vec_[n]);
+    
+    //!!!! make goal_state/robot arm to follow right hand
 
-      if (right_.pinch_strength > 0.97){
-        goal_state_pose_.pose = m.pose;
+    if (right_.pinch_strength > 0.97){
+      goal_state_pose_.pose = m.pose;
 //        goal_state_pose_.pose.orientation = q;
-      }
-      
+    }
+    
 
-      n = marker_map_["right_active"];
-      marker_vec_[n].pose = m.pose;
-      pub_vec_[n].publish(marker_vec_[n]);
+    n = marker_map_["right_active"];
+    marker_vec_[n].pose = m.pose;
+    pub_vec_[n].publish(marker_vec_[n]);
+
+    //n = marker_map_["ori_arrow"];
+
+//    marker_vec_[n].pose = m.pose;
+
+
+    // tf2::Quaternion q2;
+    // if (abs(yaw) > M_PI/2){
+    //   q2.setRPY(-(roll), pitch + M_PI/2, yaw);            
+    // }else{
+    //   q2.setRPY(-(roll), -(pitch) + M_PI/2, yaw);                
+    // }
+    // q2.normalize();
+
+    // marker_vec_[n].pose.orientation.w = q2.w();
+    // marker_vec_[n].pose.orientation.x = q2.x();
+    // marker_vec_[n].pose.orientation.y = q2.y();
+    // marker_vec_[n].pose.orientation.z = q2.z();
+    //ROS_INFO_STREAM(marker_vec_[n].pose.orientation);
+    //pub_vec_[n].publish(marker_vec_[n]);
+
       
   }
 
@@ -535,6 +652,8 @@ private:
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "plan", 1.0f, 1.0f, 0.6f, 1.0f));
     marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.1, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "execute", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_, DIST_MENU_Y_, DIST_MENU_Z_ - 0.25, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "ee_control", 0.2f, 0.8f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ + 0.15, DIST_MENU_Y_, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "scale", 1.0f, 1.0f, 1.0f, 1.0f));
     marker_vec_.push_back(markerInit(SPHERE_, "", "", DIST_MENU_X_ - 0.4, DIST_MENU_Y_, DIST_MENU_Z_, 
@@ -546,6 +665,8 @@ private:
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "plan_text", 1.0f, 1.0f, 0.6f, 1.0f));
     marker_vec_.push_back(markerInit(TEXT_, "", "EXECUTE", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ - 0.1, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "execute_text", 0.0f, 1.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(markerInit(TEXT_, "", "EE_CONTROL", DIST_MENU_X_ - 0.05, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ - 0.25, 
+                          SCALE_X_, SCALE_Y_, SCALE_Z_, "ee_control_text", 0.2f, 0.8f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(TEXT_, "", "SCALE", DIST_MENU_X_ + 0.2, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "scale_text", 1.0f, 1.0f, 1.0f, 1.0f));
     marker_vec_.push_back(markerInit(TEXT_, "", gainFormater(gain_x_ - ORG_GAIN_X_ + 1), DIST_MENU_X_ + 0.3, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_ + 0.1, 
@@ -567,6 +688,13 @@ private:
     marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
                           0.03, 0.07, 0, 0, 0.2, "scale_arrow_down", 1.0f, 1.0f, 1.0f, 1.0f));
 
+
+    //ORIENTATIO ARROW
+
+    marker_vec_.push_back(markerInit(ARROW_, "", "", 0, 0, 0.7, 
+                           0.2, 0.02, 0.02, "ori_arrow", 1.0f, 1.0f, 0.2f, 1.0f));
+
+    marker_vec_[marker_vec_.size() - 1].header.frame_id = "base_link";
 
 
     //CAMERA MOVEMENT
@@ -810,7 +938,12 @@ private:
   float body_frame_rot_roll_;
   float body_frame_rot_pitch_;
   float body_frame_rot_yaw_;
-  
+
+
+  float ori_arrow_roll_;
+  float ori_arrow_pitch_;
+  float ori_arrow_yaw_;
+
   /*
   mode 0 - normal, controlling robot
   mode 1 - controlling view using animated camera

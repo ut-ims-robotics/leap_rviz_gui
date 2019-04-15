@@ -1,0 +1,135 @@
+<launch>
+
+        <!--
+    Universal robot ur5 launch.  Loads ur5 robot description (see ur_common.launch
+    for more info)
+
+    Usage:
+        ur5_bringup.launch robot_ip:=<value>
+    -->
+
+
+    <!-- robot_ip: IP-address of the robot's socket-messaging server -->
+    <arg name="robot_ip"  default="192.168.1.100"/>
+    <arg name="limited" default="false"/>
+    <arg name="min_payload"  default="0.0"/>
+    <arg name="max_payload"  default="5.0"/>
+    <arg name="prefix" default="" />
+    <!-- robot model -->
+    <include file="$(find ur_description)/launch/ur5_upload.launch">
+        <arg name="limited" value="$(arg limited)"/>
+    </include>
+
+    <!-- ur common -->
+    <include file="$(find ur_modern_driver)/launch/ur_common.launch">
+        <arg name="prefix"  value="$(arg prefix)" />
+        <arg name="robot_ip" value="$(arg robot_ip)"/>
+        <arg name="min_payload"  value="$(arg min_payload)"/>
+        <arg name="max_payload"  value="$(arg max_payload)"/>
+    </include>
+
+
+
+    <!-- !!!!!!!!!!! ur5 !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! ||| !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! vvv !!!!!!!!!!!!!!! -->
+
+    <!-- By default, we do not start a database (it can be large) -->
+    <arg name="db" default="false" />
+
+    <!-- By default, we are not in debug mode -->
+    <arg name="debug" default="false" />
+
+    
+
+    <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+    <include file="$(find ur5_moveit_config)/launch/planning_context.launch">
+        <arg name="load_robot_description" value="true"/>
+        <arg name="limited" value="$(arg limited)"/>
+    </include>
+
+    <!-- If needed, broadcast static tf for robot root -->
+
+
+    <!-- We do not have a robot connected, so publish fake joint states -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="/use_gui" value="false"/> 
+        <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
+    </node>	
+    <!-- Given the published joint states, publish tf for the robot links -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+    <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+    <!-- <include file="$(find ur5_moveit_config)/launch/move_group.launch"> -->
+    <include file="$(find ur5_custom_config)/launch/move_group.launch">
+        <arg name="allow_trajectory_execution" value="true"/>  
+        <arg name="fake_execution" value="true"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+
+            <!-- If database loading was enabled, start mongodb as well -->
+    <!-- <include file="$(find ur5_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)"/> -->
+    <include file="$(find ur5_custom_config)/launch/default_warehouse_db.launch" if="$(arg db)"/>
+
+    <!-- !!!!!!!!!!! AAA !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! ||| !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! ur5 !!!!!!!!!!!!!!! -->
+
+
+    <!-- !!!!!!!!!!! leap !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
+
+
+    <!-- Load the listener parameters and start the driver node -->
+    <rosparam file="$(find leap_motion)/config/listener_params.yaml" command="load" />
+    <node pkg="leap_motion" type="leap_motion_driver_node" name="leap_driver" output="screen" />
+
+    <!-- Start the visualization node and make a tf so ROS and Leap orientations are the same-->
+    <node pkg="leap_motion" type="leap_motion_visualizer_node" name="leap_visualizer" output="screen" />
+
+    <!-- Load the filter parameters and start the filter node -->
+    <rosparam file="$(find leap_motion)/config/filter_params.yaml" command="load" />
+    <node pkg="leap_motion" type="leap_motion_filter_node" name="leap_filter" output="screen" />
+
+    <group ns="leap_motion">
+            <!-- Start the node that gets raw images from the Leap Motion controller -->
+            <node pkg="leap_motion" type="leap_motion_camera_node" name="leap_camera" output="screen"/>
+
+            <!-- Start the node that generates the pointcloud and a tf to orientate it the right way-->
+            <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image" output="screen"/>
+            <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 1 0 world leap_pointcloud 100" />
+    </group>
+
+    <!-- !!!!!!!!!!! AAAA !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! leap !!!!!!!!!!!!!!! -->
+
+    <!-- !!!!!!!!!!! RViz !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+    <!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
+    <!-- Open a preconfigured RViz window -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/leap_without_osvr.rviz" />
+
+    <!-- Launch our own script -->
+
+    <node name="visual_manager" pkg="leap_rviz_gui" type="visual_manager_node" respawn="false" output="screen"></node>
+
+    <arg name="sim" default="false" />
+    <arg name="debug" default="false" />
+        
+    <!-- Remap follow_joint_trajectory -->
+    <remap if="$(arg sim)" from="/follow_joint_trajectory" to="/arm_controller/follow_joint_trajectory"/>
+    <!-- moveIt controller manager -->
+    <include file="$(find ur5_custom_config)/launch/ur5_on_table_moveit_controller_manager.launch.xml"></include>
+    <!-- add robot description to parameter server-->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find ur5_custom_description)/urdf/ur5_on_table.xacro'" />
+    <!-- Launch moveit -->
+    <include file="$(find ur5_custom_config)/launch/move_group.launch">
+        <arg name="debug" default="$(arg debug)" />
+    </include>
+
+
+</launch>

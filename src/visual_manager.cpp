@@ -156,7 +156,6 @@ int main(int argc, char** argv)
 		switch(manager->getMode()){
 			case 0: //normal mode
 				
-				
 				//adjust camera
 				if (manager->getAdjust_camera()){
 					manager->publishCam();
@@ -189,7 +188,8 @@ int main(int argc, char** argv)
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
 							//ROS_INFO_STREAM(manager->getGoal_state_pose());
-							move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
+							// move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
+							move_robot_to_pose.orientation = manager->getEeOrientation();
 							// move_robot_to_pose.orientation.w = 1;
 							
 
@@ -224,10 +224,11 @@ int main(int argc, char** argv)
 							move_robot_to_pose.position = manager->transformBetweenFrames(manager->getGoal_state_pose().pose.position, "leap_hands", "world");
 							//right_hand_palm_pose.position = manager->transformBetweenFrames(manager->getRight().palm_center, "leap_hands", "world");
 							//tf_world_2_hand(manager->getRight().palm_center);
-							move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
-							
+							// move_robot_to_pose.orientation = manager->getGoal_state_pose().pose.orientation; 
+							move_robot_to_pose.orientation = manager->getEeOrientation();			
 							//move_robot_to_pose.orientation.w = 1;
-							
+
+							ROS_INFO_STREAM(move_robot_to_pose.orientation);							
 							
 							//robot planning
 							move_group.setPoseTarget(move_robot_to_pose);
@@ -242,11 +243,9 @@ int main(int argc, char** argv)
 
 							move_group.move();
 
-							// ROS_INFO_STREAM("Touching EXECUTE");
-							// ROS_INFO_STREAM(right_hand_palm_pose);
-							// ROS_INFO_STREAM("Done EXECUTE");
-							// ROS_INFO_STREAM(move_group.getCurrentPose());
 						}
+					}else if (hand_marker_collision(manager->getMarker("ee_control"), 0)){
+						manager->setMode(2);
 					}
 					
 					manager->close_menu();
@@ -329,9 +328,42 @@ int main(int argc, char** argv)
 
 				}
 
-				
-
 				break;
+
+			case 2:
+
+				if (manager->getLeft().is_present ||
+					manager->getRight().is_present){
+					if (hand_marker_collision(manager->getMarker("view_left"), 0) ||
+					hand_marker_collision(manager->getMarker("view_left"), 1)){
+				
+						manager->setNewOri(0);
+
+					}else if (hand_marker_collision(manager->getMarker("view_right"), 0) ||
+						hand_marker_collision(manager->getMarker("view_right"), 1)){
+
+						manager->setNewOri(1);
+					
+					}else if (hand_marker_collision(manager->getMarker("view_up"), 0) ||
+						hand_marker_collision(manager->getMarker("view_up"), 1)){
+
+						manager->setNewOri(2);
+
+					}else if (hand_marker_collision(manager->getMarker("view_down"), 0) ||
+						hand_marker_collision(manager->getMarker("view_down"), 1)){
+
+						manager->setNewOri(3);
+					
+					}else if (hand_marker_collision(manager->getMarker("back"), 0) ||
+						hand_marker_collision(manager->getMarker("back"), 1)){
+								
+						manager->setMode(0);
+					
+					}
+				}
+				
+				break;
+
 			default :
 				manager->setMode(0);
 		}
