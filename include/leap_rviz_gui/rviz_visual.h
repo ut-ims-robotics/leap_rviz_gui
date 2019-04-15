@@ -224,6 +224,16 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["view_up"];
       pub_vec_[n].publish(marker_vec_[n]);
+
+      n = marker_map_["view_arrow_left"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_right"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_down"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_up"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
       n = marker_map_["back"];
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["back_text"];
@@ -247,6 +257,16 @@ void publishMarkers(){
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["view_up"];
       pub_vec_[n].publish(marker_vec_[n]);
+
+      n = marker_map_["view_arrow_left"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_right"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_down"];
+      pub_vec_[n].publish(marker_vec_[n]);
+      n = marker_map_["view_arrow_up"];
+      pub_vec_[n].publish(marker_vec_[n]);
+
       n = marker_map_["back"];
       pub_vec_[n].publish(marker_vec_[n]);
       n = marker_map_["back_text"];
@@ -444,14 +464,14 @@ void setNewOri(int dir){
       break;
     //UP
     case 2:
-      ori_arrow_roll_ -= M_PI / (1.5 * number_of_view_points_);
-      ori_arrow_roll_ = fmod(ori_arrow_roll_, 2 * M_PI);
+      ori_arrow_pitch_ -= M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_pitch_ = fmod(ori_arrow_pitch_, 2 * M_PI);
 
       break;
     //DOWN
     case 3:
-      ori_arrow_roll_ += M_PI / (1.5 * number_of_view_points_);
-      ori_arrow_roll_ = fmod(ori_arrow_roll_, 2 * M_PI);
+      ori_arrow_pitch_ += M_PI / (1.5 * number_of_view_points_);
+      ori_arrow_pitch_ = fmod(ori_arrow_pitch_, 2 * M_PI);
 
       break;
     
@@ -684,9 +704,9 @@ private:
     //SCALER ARROWS
 
     marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
-                          0.03, 0.07, 0, 0, -0.2, "scale_arrow_up", 1.0f, 1.0f, 1.0f, 1.0f));
+                          0.03, 0.07, 0, 0, 0, 0, 0, 0, -0.2, "scale_arrow_up", 1.0f, 1.0f, 1.0f, 1.0f));
     marker_vec_.push_back(arrowMarkerInit(DIST_MENU_X_ + 0.25, DIST_MENU_Y_, DIST_MENU_Z_, 
-                          0.03, 0.07, 0, 0, 0.2, "scale_arrow_down", 1.0f, 1.0f, 1.0f, 1.0f));
+                          0.03, 0.07, 0, 0, 0, 0, 0, 0, 0.2, "scale_arrow_down", 1.0f, 1.0f, 1.0f, 1.0f));
 
 
     //ORIENTATIO ARROW
@@ -713,6 +733,25 @@ private:
     marker_vec_.push_back(markerInit(TEXT_, "", "BACK", 0, DIST_MENU_Y_ - 0.1, DIST_MENU_Z_, 
                           SCALE_X_, SCALE_Y_, SCALE_Z_, "back_text", 0.4f, 1.0f, 1.0f, 1.0f));
     
+    // arrowMarkerInit(pos_x, pos_y, pos_z, 
+    //       shaft_d, head_d, head_l, start_x, start_y, start_z, 
+    //       end_x, end_y, end_z, ns, r, g, b, a)
+
+
+    marker_vec_.push_back(arrowMarkerInit(0.3, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          0.03, 0.07, 0, -SCALE_X_/2, 0, 0, 
+                          SCALE_X_/2, 0, 0, "view_arrow_left", 1.0f, 0.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(arrowMarkerInit(-0.3, DIST_MENU_Y_, DIST_MENU_Z_, 
+                          0.03, 0.07, 0, SCALE_X_/2, 0, 0, 
+                          -SCALE_X_/2, 0, 0, "view_arrow_right", 1.0f, 0.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(arrowMarkerInit(0, DIST_MENU_Y_, DIST_MENU_Z_ + 0.2, 
+                          0.03, 0.07, 0, 0, 0, -SCALE_Z_/2, 
+                          0, 0, SCALE_Z_/2, "view_arrow_down", 1.0f, 0.0f, 0.0f, 1.0f));
+    marker_vec_.push_back(arrowMarkerInit(0, DIST_MENU_Y_, DIST_MENU_Z_ - 0.2, 
+                          0.03, 0.07, 0, 0, 0, SCALE_Z_/2, 
+                          0, 0, -SCALE_Z_/2, "view_arrow_up", 1.0f, 0.0f, 0.0f, 1.0f));
+
+                          
 
     //HANDS
   
@@ -842,7 +881,9 @@ private:
   }
 
   visualization_msgs::Marker arrowMarkerInit(float_t pos_x, float_t pos_y, float_t pos_z, 
-          float_t shaft_d, float_t head_d, float_t head_l,float_t start_z,float_t end_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
+          float_t shaft_d, float_t head_d, float_t head_l, float_t start_x, float_t start_y, float_t start_z, 
+          float_t end_x, float_t end_y, float_t end_z, const char* ns, float_t r, float_t g, float_t b, float_t a){
+    
     visualization_msgs::Marker marker;
 
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
@@ -871,11 +912,13 @@ private:
     marker.pose.orientation.w = 1.0;
 
     geometry_msgs::Point p;
-    p.x = 0.0;
-    p.y = 0.0;
+    p.x = start_x;
+    p.y = start_y;
     p.z = start_z;
-
     marker.points.push_back(p);
+    
+    p.x = end_x;
+    p.y = end_y;
     p.z = end_z;
     marker.points.push_back(p);
     
