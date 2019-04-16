@@ -1,0 +1,108 @@
+<launch>
+    <!-- !!!!!!!!!!! CAM !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! ||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! vvv !!!!!!!!!!!!!!! -->
+	
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+        <param name="video_device" value="/dev/video1" />
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="pixel_format" value="yuyv" />
+        <param name="camera_frame_id" value="usb_cam" />
+        <param name="io_method" value="mmap"/>
+    </node>
+
+
+
+	<!-- !!!!!!!!!!! ur5 !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! ||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! vvv !!!!!!!!!!!!!!! -->
+	
+	<!-- By default, we do not start a database (it can be large) -->
+	<arg name="db" default="false" />
+
+	<!-- By default, we are not in debug mode -->
+	<arg name="debug" default="false" />
+	
+	<arg name="limited" default="false"/>
+
+	<!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+	<include file="$(find ur5_moveit_config)/launch/planning_context.launch">
+		<arg name="load_robot_description" value="true"/>
+		<arg name="limited" value="$(arg limited)"/>
+	</include>
+
+	<!-- If needed, broadcast static tf for robot root -->
+	
+
+	<!-- We do not have a robot connected, so publish fake joint states -->
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+		<param name="/use_gui" value="false"/> 
+		<rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
+	</node>	
+	<!-- Given the published joint states, publish tf for the robot links -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+	<!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+	<!-- <include file="$(find ur5_moveit_config)/launch/move_group.launch"> -->
+	<include file="$(find ur5_custom_config)/launch/move_group.launch">
+		<arg name="allow_trajectory_execution" value="true"/>  
+		<arg name="fake_execution" value="true"/>
+		<arg name="info" value="true"/>
+		<arg name="debug" value="$(arg debug)"/>
+	</include>
+	
+	
+			<!-- If database loading was enabled, start mongodb as well -->
+	<!-- <include file="$(find ur5_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)"/> -->
+	<include file="$(find ur5_custom_config)/launch/default_warehouse_db.launch" if="$(arg db)"/>
+
+	<!-- !!!!!!!!!!! AAA !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! ||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! ur5 !!!!!!!!!!!!!!! -->
+
+
+	<!-- !!!!!!!!!!! leap !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
+
+
+	<!-- Load the listener parameters and start the driver node -->
+	<rosparam file="$(find leap_motion)/config/listener_params.yaml" command="load" />
+	<node pkg="leap_motion" type="leap_motion_driver_node" name="leap_driver" output="screen" />
+	
+	<!-- Start the visualization node and make a tf so ROS and Leap orientations are the same-->
+	<node pkg="leap_motion" type="leap_motion_visualizer_node" name="leap_visualizer" output="screen" />
+
+	<!-- Load the filter parameters and start the filter node -->
+	<rosparam file="$(find leap_motion)/config/filter_params.yaml" command="load" />
+	<node pkg="leap_motion" type="leap_motion_filter_node" name="leap_filter" output="screen" />
+
+	<group ns="leap_motion">
+        <!-- Start the node that gets raw images from the Leap Motion controller -->
+        <node pkg="leap_motion" type="leap_motion_camera_node" name="leap_camera" output="screen"/>
+
+        <!-- Start the node that generates the pointcloud and a tf to orientate it the right way-->
+        <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image" output="screen"/>
+        <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 1 0 world leap_pointcloud 100" />
+    </group>
+
+	<!-- !!!!!!!!!!! AAAA !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! leap !!!!!!!!!!!!!!! -->
+
+	<!-- !!!!!!!!!!! RViz !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
+	<!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
+	<!-- Open a preconfigured RViz window -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/cam_leap_without_osvr.rviz" />
+
+	<!-- Launch our own script -->
+	
+	<node name="visual_manager" pkg="leap_rviz_gui" type="visual_manager_node" respawn="false" output="screen"></node>
+
+    <node pkg="tf" type="static_transform_publisher" name="body_to_quads" args="0 -3 0.7 3.14 0 -1.507 base_link quad 100" />
+    
+    
+
+</launch>

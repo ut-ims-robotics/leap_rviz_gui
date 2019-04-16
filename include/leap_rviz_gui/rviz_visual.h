@@ -547,22 +547,26 @@ void leapFilCallback(const leap_motion::Human& msg){
     m.pose.orientation.y = q.y();
     m.pose.orientation.z = q.z();
 
+    
+     //Resetting gain if left pinch
+    if (left_.pinch_strength > 0.97){
+      resetGain();
+    }
+
     marker_vec_[n] = m;
-    
-    
     pub_vec_[n].publish(marker_vec_[n]);
     
     
     n = marker_map_["left_active"];
 
+
+    
+
     marker_vec_[n].pose = m.pose;
             
     pub_vec_[n].publish(marker_vec_[n]);
 
-    //Resetting gain if left pinch
-    if (left_.pinch_strength > 0.97){
-      resetGain();
-    }
+   
 
         
   }
@@ -601,6 +605,12 @@ void leapFilCallback(const leap_motion::Human& msg){
     m.pose.orientation.y = q.y();
     m.pose.orientation.z = q.z();
 
+
+     if (right_.pinch_strength > 0.97){
+      goal_state_pose_.pose = m.pose;
+//        goal_state_pose_.pose.orientation = q;
+    }
+
     marker_vec_[n] = m;
   
 
@@ -609,35 +619,11 @@ void leapFilCallback(const leap_motion::Human& msg){
     
     //!!!! make goal_state/robot arm to follow right hand
 
-    if (right_.pinch_strength > 0.97){
-      goal_state_pose_.pose = m.pose;
-//        goal_state_pose_.pose.orientation = q;
-    }
-    
 
     n = marker_map_["right_active"];
     marker_vec_[n].pose = m.pose;
     pub_vec_[n].publish(marker_vec_[n]);
 
-    //n = marker_map_["ori_arrow"];
-
-//    marker_vec_[n].pose = m.pose;
-
-
-    // tf2::Quaternion q2;
-    // if (abs(yaw) > M_PI/2){
-    //   q2.setRPY(-(roll), pitch + M_PI/2, yaw);            
-    // }else{
-    //   q2.setRPY(-(roll), -(pitch) + M_PI/2, yaw);                
-    // }
-    // q2.normalize();
-
-    // marker_vec_[n].pose.orientation.w = q2.w();
-    // marker_vec_[n].pose.orientation.x = q2.x();
-    // marker_vec_[n].pose.orientation.y = q2.y();
-    // marker_vec_[n].pose.orientation.z = q2.z();
-    //ROS_INFO_STREAM(marker_vec_[n].pose.orientation);
-    //pub_vec_[n].publish(marker_vec_[n]);
 
       
   }
@@ -756,16 +742,16 @@ private:
     //HANDS
   
     marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandLeft.stl", "", 0, 0, 0, 
-                          0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
+                          0.01, 0.01, 0.01, "custom_left", 0.5f, 0.0f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandRight.stl", "", 0, 0, 0, 
                           0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
 
 
 
     marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, 
-                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 1.0f, 0.0f, 0.0f, 0.3f));
+                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "left_active", 0.5f, 0.0f, 0.0f, 0.2f));
     marker_vec_.push_back(markerInit(CUBE_, "", "", 0, 0, 0, 
-                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.3f));
+                          SCALE_ACT_X_, SCALE_ACT_Y_, SCALE_ACT_Z_, "right_active", 0.0f, 0.0f, 1.0f, 0.2f));
     
 
     fillMap();

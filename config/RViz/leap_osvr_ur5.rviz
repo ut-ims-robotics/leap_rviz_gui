@@ -3,8 +3,7 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /OSVR Plugin for RViz1/Offset1
+      Expanded: ~
       Splitter Ratio: 0.5
     Tree Height: 527
   - Class: rviz/Selection
@@ -29,8 +28,6 @@ Panels:
     SyncSource: Image
   - Class: rviz_visual_tools/RvizVisualToolsGui
     Name: RvizVisualToolsGui
-Toolbars:
-  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -329,24 +326,7 @@ Visualization Manager:
       Value: false
     - Class: OSVR Plugin for RViz
       Enabled: true
-      Follow RViz camera: false
-      Fullscreen: true
       Name: OSVR Plugin for RViz
-      OSVR tf frame: /rviz_plugin_osvr/head
-      Offset:
-        X: 0
-        Y: -1
-        Z: 0
-      Publish tf: true
-      Reset orientation: false
-      Scale:
-        X: 1
-        Y: 1
-        Z: 1
-      Screen name: HDMI-0
-      Target frame: body
-      Use tracker: false
-      Value: true
     - Class: rviz/Group
       Displays:
         - Class: rviz/Group
@@ -547,6 +527,42 @@ Visualization Manager:
                   Value: true
               Enabled: true
               Name: Back
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: /visual_manager/view_arrow_left_marker
+                  Name: View_arrow_left_marker
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: /visual_manager/view_arrow_right_marker
+                  Name: View_arrow_right_marker
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: /visual_manager/view_arrow_down_marker
+                  Name: View_arrow_down_marker
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: /visual_manager/view_arrow_up_marker
+                  Name: View_arrow_up_marker
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+              Enabled: true
+              Name: View_arrows
           Enabled: true
           Name: View_changer
         - Class: rviz/Group
@@ -569,6 +585,26 @@ Visualization Manager:
               Value: true
           Enabled: true
           Name: Menu
+        - Class: rviz/Group
+          Displays:
+            - Class: rviz/Marker
+              Enabled: true
+              Marker Topic: /visual_manager/ee_control_marker
+              Name: Ee_control_marker
+              Namespaces:
+                {}
+              Queue Size: 100
+              Value: true
+            - Class: rviz/Marker
+              Enabled: true
+              Marker Topic: /visual_manager/ee_control_text_marker
+              Name: Ee_control_text_marker
+              Namespaces:
+                {}
+              Queue Size: 100
+              Value: true
+          Enabled: true
+          Name: EE_control
         - Class: rviz/Group
           Displays:
             - Class: rviz/Marker
@@ -608,6 +644,14 @@ Visualization Manager:
           Value: true
       Enabled: false
       Name: Axes
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visual_manager/ori_arrow_marker
+      Name: Ori_arrow_marker
+      Namespaces:
+        ori_arrow: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
