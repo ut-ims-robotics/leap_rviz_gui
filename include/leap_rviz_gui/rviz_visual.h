@@ -742,7 +742,7 @@ private:
     //HANDS
   
     marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandLeft.stl", "", 0, 0, 0, 
-                          0.01, 0.01, 0.01, "custom_left", 0.5f, 0.0f, 0.0f, 1.0f));
+                          0.01, 0.01, 0.01, "custom_left", 1.0f, 0.0f, 0.0f, 1.0f));
     marker_vec_.push_back(markerInit(MESH_, "package://leap_rviz_gui/stl/Black-HandRight.stl", "", 0, 0, 0, 
                           0.01, 0.01, 0.01, "custom_right", 0.0f, 0.0f, 1.0f, 1.0f));
 
