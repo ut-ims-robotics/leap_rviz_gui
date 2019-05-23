@@ -7,12 +7,12 @@ Before using, please make sure you have install following packages and plugins
 
 | Package or plugin  | Usage | GitHub link |
 | ------------- | ------------- | ------------- |
-| vrui_rviz  | Main package  | https://github.com/ut-ims-robotics/vrui_rviz/  |
-| leap_motion  | LM package  |https://github.com/ros-drivers/leap_motion  |
-| universal_robot  | UR5 description package  | https://github.com/ros-industrial/universal_robot  |
-| ur5_path_planning  | UR5 moving package  | https://github.com/ut-ims-robotics/ur5_path_planning  |
-| rviz_plugin_osvr  | OSVR RViz plugin  | https://github.com/UTNuclearRoboticsPublic/rviz_plugin_osvr  |
-| rviz_cinematographer  | RViz camera movement plugin  | https://github.com/AIS-Bonn/rviz_cinematographer  |
+| vrui_rviz  | Main package  | [link](https://github.com/ut-ims-robotics/vrui_rviz/)  |
+| leap_motion  | LM package  | [link](https://github.com/ros-drivers/leap_motion)  |
+| universal_robot  | UR5 description package  | [link](https://github.com/ros-industrial/universal_robot)  |
+| ur5_path_planning  | UR5 moving package  | [link](https://github.com/ut-ims-robotics/ur5_path_planning)  |
+| rviz_plugin_osvr  | OSVR RViz plugin  | [link](https://github.com/UTNuclearRoboticsPublic/rviz_plugin_osvr)  |
+| rviz_cinematographer  | RViz camera movement plugin  | [link](https://github.com/AIS-Bonn/rviz_cinematographer)  |
 
 
 
