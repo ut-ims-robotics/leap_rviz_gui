@@ -3,6 +3,18 @@
 Vrui_rviz is a virutal reality user interface in RViz that uses Leap Motion (LM) contrller, OSVR headset and UR5 robot to provide a way to have hands-free control of robot in virtual reality
 
 ## Installing
+Before using, please make sure you have install following packages and plugins
+
+| Package or plugin  | Usage | GitHub link |
+| ------------- | ------------- | ------------- |
+| vrui_rviz  | Main package  | https://github.com/ut-ims-robotics/vrui_rviz/  |
+| leap_motion  | LM package  |https://github.com/ros-drivers/leap_motion  |
+| universal_robot  | UR5 description package  | https://github.com/ros-industrial/universal_robot  |
+| ur5_path_planning  | UR5 moving package  | https://github.com/ut-ims-robotics/ur5_path_planning  |
+| rviz_plugin_osvr  | OSVR RViz plugin  | https://github.com/UTNuclearRoboticsPublic/rviz_plugin_osvr  |
+| rviz_cinematographer  | RViz camera movement plugin  | https://github.com/AIS-Bonn/rviz_cinematographer  |
+
+
 
 ## Using
 
