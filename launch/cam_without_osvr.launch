@@ -95,11 +95,11 @@
 	<!-- !!!!!!!!!!! |||| !!!!!!!!!!!!!!! -->
 	<!-- !!!!!!!!!!! vvvv !!!!!!!!!!!!!!! -->
 	<!-- Open a preconfigured RViz window -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_rviz_gui)/config/RViz/cam_leap_without_osvr.rviz" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find vrui_rviz)/config/RViz/cam_leap_without_osvr.rviz" />
 
 	<!-- Launch our own script -->
 	
-	<node name="visual_manager" pkg="leap_rviz_gui" type="visual_manager_node" respawn="false" output="screen"></node>
+	<node name="visual_manager" pkg="vrui_rviz" type="visual_manager_node" respawn="false" output="screen"></node>
 
     <node pkg="tf" type="static_transform_publisher" name="body_to_quads" args="0 -3 0.7 3.14 0 -1.507 base_link quad 100" />
     

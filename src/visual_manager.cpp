@@ -25,14 +25,13 @@
 
 #include <rviz_animated_view_controller/CameraTrajectory.h>
 
-#include <leap_rviz_gui/rviz_visual.h>
+#include <vrui_rviz/rviz_visual.h>
 
 
 
 Visuals* manager;
 
 //Callbacks
-
 //Functions
 
 //hand 
